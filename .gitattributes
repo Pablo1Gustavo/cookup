@@ -1,0 +1,12 @@
+# Ignore build extensions
+*.c linguist-detectable=false
+*.h linguist-detectable=false
+*.cpp linguist-detectable=false
+*.cc linguist-detectable=false
+*.swift linguist-detectable=false
+CMakeLists.txt linguist-detectable=false
+*.cmake linguist-detectable=false
+*.html linguist-detectable=false
+*.kt linguist-detectable=false
+*.kts linguist-detectable=false
+
