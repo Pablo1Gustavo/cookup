@@ -8,15 +8,14 @@ class Introducao extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Set the background image using a Container with BoxDecoration
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/intro_background.png'),
-            fit: BoxFit.cover, // Adjust as needed (cover, contain, etc.)
+            fit: BoxFit.cover,
           ),
         ),
-        child: Center( // Center content within the background image
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
