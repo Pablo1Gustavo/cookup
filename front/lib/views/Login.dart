@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+
 import '../utils/constants.dart';
 import 'Home.dart';
 
@@ -22,30 +23,10 @@ class _LoginState extends State<Login> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 300.0),
-            RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: 'COOK',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 50.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextSpan(
-                    text: 'UP',
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontSize: 50.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+            SizedBox(height: 200),
+            Center(
+              child: Image.asset('assets/logo_cookup.png', width: 400, height: 200),
             ),
-            SizedBox(height: 50.0),
             Align(
               alignment: Alignment.bottomLeft,
               child: Text(
