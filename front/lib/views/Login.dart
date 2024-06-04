@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 
 import '../utils/constants.dart';
-import 'Home.dart';
+import 'Profile.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -86,7 +86,7 @@ class _LoginState extends State<Login> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Home(),
+                      builder: (context) => Profile(),
                     ),
                   );
                 },
