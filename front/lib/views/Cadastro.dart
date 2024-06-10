@@ -1,18 +1,19 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:front/views/Cadastro.dart';
+import 'package:front/views/Login.dart';
 
 
 import '../utils/constants.dart';
 import 'Profile.dart';
 
-class Login extends StatefulWidget {
+class Cadastro extends StatefulWidget {
   @override
-  _LoginState createState() => _LoginState();
+  _CadastroState createState() => _CadastroState();
 }
 
-class _LoginState extends State<Login> {
-  final TextEditingController _loginController = TextEditingController();
+class _CadastroState extends State<Cadastro> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _cadastroController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
 
   @override
@@ -31,6 +32,30 @@ class _LoginState extends State<Login> {
             Align(
               alignment: Alignment.bottomLeft,
               child: Text(
+                "Email",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            TextFormField(
+              controller: _emailController,
+              decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  labelText: 'Insira seu Email',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  )),
+            ),
+            SizedBox(height: 30),
+             Align(
+              alignment: Alignment.bottomLeft,
+              child: Text(
                 "Login",
                 style: TextStyle(
                   color: Colors.black,
@@ -40,7 +65,7 @@ class _LoginState extends State<Login> {
               ),
             ),
             TextFormField(
-              controller: _loginController,
+              controller: _cadastroController,
               decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -75,7 +100,7 @@ class _LoginState extends State<Login> {
                     borderSide: BorderSide(color: Colors.grey),
                   )),
             ),
-            SizedBox(height: 200),
+            SizedBox(height: 100),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -87,24 +112,24 @@ class _LoginState extends State<Login> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Profile(),
+                      builder: (context) => Login(),
                     ),
                   );
                 },
-                child: Text('Logar'),
+                child: Text('Cadastrar'),
               ),
             ),
             RichText(
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: "Não possui conta? ",
+                    text: "Ja tem uma conta? ",
                     style: TextStyle(
                         color: Color.fromARGB(
                             255, 16, 16, 16)),
                   ),
                   TextSpan(
-                    text: "Cadastre-se",
+                    text: "conecte-se",
                     style: TextStyle(
                       color:
                           primaryColor,
@@ -116,7 +141,7 @@ class _LoginState extends State<Login> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Cadastro(),
+                            builder: (context) => Login(),
                           ),
                         );
                       },
