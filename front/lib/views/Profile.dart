@@ -4,6 +4,8 @@ import 'package:front/utils/constants.dart';
 
 
 class Profile extends StatefulWidget {
+  const Profile({super.key});
+
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -45,10 +47,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     SizedBox(height: screenHeight * 0.08),
                     CircleAvatar(
                       radius: screenHeight * 0.05,
-                      backgroundImage: NetworkImage('https://i.pinimg.com/564x/57/e4/60/57e4605cc710914108c49482bdda1366.jpg'),
+                      backgroundImage: const NetworkImage('https://i.pinimg.com/564x/57/e4/60/57e4605cc710914108c49482bdda1366.jpg'),
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       'Marcos D. Pedro',
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
@@ -59,16 +61,16 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         onPressed: () {
                           // Ação ao clicar no botão Editar
                         },
-                        child: Text('Editar',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
-                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
+                        ),
+                        child: const Text('Editar',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
                         ),
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.03),
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Column(
@@ -98,18 +100,18 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       ],
                     ),
                     SizedBox(height: screenHeight * 0.03),
-                    Text(
+                    const Text(
                       'Fazedor de miojo na semana e chef nos feriados.',
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.location_pin, color: Colors.red),
-                        Text('De Natal, Brasil', style: TextStyle(fontSize: 16)),
-                        SizedBox(width: 5),
+                        const Icon(Icons.location_pin, color: Colors.red),
+                        const Text('De Natal, Brasil', style: TextStyle(fontSize: 16)),
+                        const SizedBox(width: 5),
                         CountryFlag.fromCountryCode(
                           'BR',
                           height: 24,
@@ -126,7 +128,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 labelColor: primaryColor,
                 unselectedLabelColor: Colors.grey,
                 indicatorColor: primaryColor,
-                tabs: [
+                tabs: const [
                   Tab(icon: Icon(Icons.photo_library), text: "Feed"),
                   Tab(icon: Icon(Icons.book), text: "Receitas Salvas"),
                   Tab(icon: Icon(Icons.star), text: "Conquistas"),
@@ -135,7 +137,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
-                  children: [
+                  children: const [
                     FeedTab(),
                     SavedRecipesTab(),
                     AchievementsTab(),
@@ -148,7 +150,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 4,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home, color: primaryColor,), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.search , color: primaryColor), label: 'Explorar'),
           BottomNavigationBarItem(icon: Icon(Icons.book, color: primaryColor), label: 'Receitas'),
@@ -161,10 +163,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 }
 
 class AchievementsTab extends StatelessWidget {
+  const AchievementsTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: [
+      children: const [
         AchievementItem(
           title: 'Fez o primeiro sushi',
           date: '20/04/2023',
@@ -189,6 +193,8 @@ class AchievementsTab extends StatelessWidget {
 }
 
 class FeedTab extends StatelessWidget {
+  const FeedTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GridView.count(
@@ -204,6 +210,8 @@ class FeedTab extends StatelessWidget {
 }
 
 class SavedRecipesTab extends StatelessWidget {
+  const SavedRecipesTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -250,7 +258,7 @@ class SavedRecipeCategory extends StatelessWidget {
   final String title;
   final List<SavedRecipeItem> recipes;
 
-  SavedRecipeCategory({required this.title, required this.recipes});
+  const SavedRecipeCategory({super.key, required this.title, required this.recipes});
 
   @override
   Widget build(BuildContext context) {
@@ -261,9 +269,9 @@ class SavedRecipeCategory extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
-          Container(
+          SizedBox(
             height: 300,
             width: MediaQuery.of(context).size.width,
             child: Stack(
@@ -282,7 +290,7 @@ class SavedRecipeItem extends StatelessWidget {
   final int index;
   final int totalItems;
 
-  SavedRecipeItem({required this.title, required this.imageUrl, required this.index, required this.totalItems});
+  const SavedRecipeItem({super.key, required this.title, required this.imageUrl, required this.index, required this.totalItems});
 
   @override
   Widget build(BuildContext context) {
@@ -290,7 +298,7 @@ class SavedRecipeItem extends StatelessWidget {
       left: (totalItems - index - 1) * 100.0,
       child: Container(
         width: 120,
-        margin: EdgeInsets.all(8.0),
+        margin: const EdgeInsets.all(8.0),
         child: Stack(
           children: [
             ClipRRect(
@@ -303,10 +311,10 @@ class SavedRecipeItem extends StatelessWidget {
               right: 0,
               child: Container(
                 color: Colors.black.withOpacity(0.6), // Semi-transparent background
-                padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                 child: Text(
                   title,
-                  style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -323,7 +331,7 @@ class AchievementItem extends StatelessWidget {
   final String points;
   final IconData icon;
 
-  AchievementItem({required this.title, required this.date, required this.points, required this.icon});
+  const AchievementItem({super.key, required this.title, required this.date, required this.points, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -331,7 +339,7 @@ class AchievementItem extends StatelessWidget {
       leading: Icon(icon, color: Colors.green),
       title: Text(title),
       subtitle: Text(date),
-      trailing: Text(points, style: TextStyle(color: Colors.orange, fontSize: 14)),
+      trailing: Text(points, style: const TextStyle(color: Colors.orange, fontSize: 14)),
     );
   }
 }

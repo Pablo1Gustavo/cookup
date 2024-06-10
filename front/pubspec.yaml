@@ -15,6 +15,9 @@ dependencies:
 
   cupertino_icons: ^1.0.6
   flutter_svg: ^2.0.10+1
+  image_input: ^0.0.5
+  image_picker: ^1.1.2
+  permission_handler: ^10.0.0
 
 dev_dependencies:
   flutter_test:

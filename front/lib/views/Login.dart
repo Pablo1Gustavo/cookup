@@ -7,6 +7,8 @@ import '../utils/constants.dart';
 import 'Profile.dart';
 
 class Login extends StatefulWidget {
+  const Login({super.key});
+
   @override
   _LoginState createState() => _LoginState();
 }
@@ -24,11 +26,11 @@ class _LoginState extends State<Login> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 200),
+            const SizedBox(height: 200),
             Center(
               child: Image.asset('assets/logo_cookup.png', width: 400, height: 200),
             ),
-            Align(
+            const Align(
               alignment: Alignment.bottomLeft,
               child: Text(
                 "Login",
@@ -47,12 +49,12 @@ class _LoginState extends State<Login> {
                   labelText: 'Insira seu login',
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0)),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey),
                   )),
             ),
-            SizedBox(height: 30),
-            Align(
+            const SizedBox(height: 30),
+            const Align(
               alignment: Alignment.bottomLeft,
               child: Text(
                 "Senha",
@@ -71,15 +73,15 @@ class _LoginState extends State<Login> {
                   labelText: 'Insira sua senha',
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0)),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey),
                   )),
             ),
-            SizedBox(height: 200),
+            const SizedBox(height: 200),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                style: ButtonStyle(
+                style: const ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll<Color>(primaryColor),
                   foregroundColor: WidgetStatePropertyAll<Color>(Colors.white),
                 ),
@@ -87,17 +89,17 @@ class _LoginState extends State<Login> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Profile(),
+                      builder: (context) => const Profile(),
                     ),
                   );
                 },
-                child: Text('Logar'),
+                child: const Text('Logar'),
               ),
             ),
             RichText(
               text: TextSpan(
                 children: [
-                  TextSpan(
+                  const TextSpan(
                     text: "Não possui conta? ",
                     style: TextStyle(
                         color: Color.fromARGB(
@@ -105,7 +107,7 @@ class _LoginState extends State<Login> {
                   ),
                   TextSpan(
                     text: "Cadastre-se",
-                    style: TextStyle(
+                    style: const TextStyle(
                       color:
                           primaryColor,
                       fontWeight: FontWeight
