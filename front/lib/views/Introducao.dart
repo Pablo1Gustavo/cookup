@@ -9,7 +9,7 @@ class Introducao extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/intro_background.png'),
             fit: BoxFit.cover,
@@ -19,20 +19,20 @@ class Introducao extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(32, 50, 32, 4),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(32, 50, 32, 4),
                 child: Text(
                   'Aprimore suas habilidades culinárias!',
                   style: TextStyle(fontSize: 50, color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
-              SizedBox(height: 450),
+              const SizedBox(height: 450),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    style: ButtonStyle(
+                    style: const ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll<Color>(primaryColor),
                       foregroundColor: WidgetStatePropertyAll<Color>(Colors.white),
                     ),
@@ -40,11 +40,11 @@ class Introducao extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Login(),
+                          builder: (context) => const Login(),
                         ),
                       );
                     },
-                    child: Text('Começar'),
+                    child: const Text('Começar'),
                   ),
                 ),
               ),
