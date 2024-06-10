@@ -12,7 +12,8 @@ class Cadastro extends StatefulWidget {
 }
 
 class _CadastroState extends State<Cadastro> {
-  final TextEditingController _CadastroController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _cadastroController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
 
   @override
@@ -31,7 +32,7 @@ class _CadastroState extends State<Cadastro> {
             Align(
               alignment: Alignment.bottomLeft,
               child: Text(
-                "Login",
+                "Email",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 16.0,
@@ -40,11 +41,11 @@ class _CadastroState extends State<Cadastro> {
               ),
             ),
             TextFormField(
-              controller: _CadastroController,
+              controller: _emailController,
               decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
-                  labelText: 'Insira seu login',
+                  labelText: 'Insira seu Email',
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0)),
                   focusedBorder: OutlineInputBorder(
@@ -64,7 +65,7 @@ class _CadastroState extends State<Cadastro> {
               ),
             ),
             TextFormField(
-              controller: _CadastroController,
+              controller: _cadastroController,
               decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -111,7 +112,7 @@ class _CadastroState extends State<Cadastro> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Profile(),
+                      builder: (context) => Login(),
                     ),
                   );
                 },
