@@ -2,11 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:front/utils/constants.dart';
 import 'Login.dart';
 
-class Introducao extends StatelessWidget {
+class Introducao extends StatefulWidget {
   const Introducao({super.key});
 
   @override
+  State<Introducao> createState() => _IntroducaoState();
+}
+
+class _IntroducaoState extends State<Introducao> {
+
+
+  @override
   Widget build(BuildContext context) {
+  final screenHeight = MediaQuery.of(context).size.height;
+  final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -26,7 +35,7 @@ class Introducao extends StatelessWidget {
                   style: TextStyle(fontSize: 50, color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(height: 450),
+              SizedBox(height: screenHeight * 0.3),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: SizedBox(
