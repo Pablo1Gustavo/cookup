@@ -14,6 +14,12 @@ class NewRecipe extends StatefulWidget {
 
 class _NewRecipeState extends State<NewRecipe> {
   XFile? selectedImage;
+  List<Step> steps = [
+    Step(title: 'Passo 1'),
+    Step(title: 'Passo 2'),
+    Step(title: 'Passo 3'),
+  ];
+  List<String> ingredients = [];
 
   Future<void> _pickImage() async {
     var status = await Permission.camera.request();
@@ -167,15 +173,29 @@ class _NewRecipeState extends State<NewRecipe> {
     }
   }
 
+  void _addStep() {
+    setState(() {
+      steps.add(Step(title: 'Passo ${steps.length + 1}'));
+    });
+  }
+
+  void _removeStep(int index) {
+    setState(() {
+      steps.removeAt(index);
+      for (int i = 0; i < steps.length; i++) {
+        steps[i].title = 'Passo ${i + 1}';
+      }
+    });
+  }
+
+    void _removeIngredient(int index) {
+    setState(() {
+      ingredients.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<XFile> imageInputImages = [];
-    bool allowEditImageInput = true;
-    List<Step> steps = [
-      Step(title: 'Passo 1'),
-      Step(title: 'Passo 2'),
-      Step(title: 'passo 3'),
-    ];
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -264,6 +284,55 @@ class _NewRecipeState extends State<NewRecipe> {
               ),
             ),
             const SizedBox(height: 10.0),
+            const Text(
+              'Ingredientes',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10.0),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: ingredients.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(ingredients[index]),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _removeIngredient(index),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton(
+              onPressed: _showAddItemBottomSheet,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: white,
+                padding: const EdgeInsets.all(10.0),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add,
+                    size: 24,
+                    color: black400,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Adicionar Ingrediente',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: black400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10.0),
+            Divider(),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -360,11 +429,43 @@ class _NewRecipeState extends State<NewRecipe> {
                                 ],
                               ),
                             ),
+                            const SizedBox(width: 24),
+                            IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _removeStep(index),
+                            ),
                           ],
                         )
                       ],
                     );
                   },
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: _addStep,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: white,
+                    padding: const EdgeInsets.all(10.0),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add,
+                        size: 24,
+                        color: black400,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Adicionar Passo',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: black400,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
