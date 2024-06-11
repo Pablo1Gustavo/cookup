@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:front/utils/constants.dart';
+import 'package:front/views/Mission_page.dart';
 import 'package:front/views/NewRecipe.dart';
 import '../components/BottomNavigation.dart';
 import '../components/RecipeCardSet.dart';
@@ -19,6 +20,7 @@ class _RecipeListState extends State<RecipeList> with SingleTickerProviderStateM
   final List<Widget> _pages = [
     Profile(),
     RecipeList(),
+    MissoesPage(),
   ];
 
   void _onTabTapped(int index) {
