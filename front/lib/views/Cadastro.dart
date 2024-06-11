@@ -18,6 +18,8 @@ class _CadastroState extends State<Cadastro> {
 
   @override
   Widget build(BuildContext context) {
+  final screenHeight = MediaQuery.of(context).size.height;
+  final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Padding(
@@ -25,7 +27,7 @@ class _CadastroState extends State<Cadastro> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 200),
+            SizedBox(height: screenHeight * 0.1),
             Center(
               child: Image.asset('assets/logo_cookup.png', width: 400, height: 200),
             ),
@@ -100,7 +102,7 @@ class _CadastroState extends State<Cadastro> {
                     borderSide: BorderSide(color: Colors.grey),
                   )),
             ),
-            SizedBox(height: 100),
+            SizedBox(height: screenHeight * 0.05),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

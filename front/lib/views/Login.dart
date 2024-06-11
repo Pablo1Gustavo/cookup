@@ -19,6 +19,8 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+  final screenHeight = MediaQuery.of(context).size.height;
+  final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Padding(
@@ -26,7 +28,7 @@ class _LoginState extends State<Login> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            const SizedBox(height: 200),
+            SizedBox(height: screenHeight * 0.1),
             Center(
               child: Image.asset('assets/logo_cookup.png', width: 400, height: 200),
             ),
@@ -77,7 +79,7 @@ class _LoginState extends State<Login> {
                     borderSide: BorderSide(color: Colors.grey),
                   )),
             ),
-            const SizedBox(height: 200),
+            SizedBox(height: screenHeight * 0.2),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
