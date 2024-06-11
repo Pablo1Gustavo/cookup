@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:front/utils/constants.dart';
+import 'package:front/views/Mission_page.dart';
 import 'package:front/views/RecipeList.dart';
 import '../components/BottomNavigation.dart';
 
@@ -19,6 +20,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   final List<Widget> _pages = [
     Profile(),
     RecipeList(),
+    MissoesPage(),
   ];
 
   void _onTabTapped(int index) {
@@ -166,7 +168,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           ),
         ],
       ),
-       bottomNavigationBar: BottomNavigation(
+      bottomNavigationBar: BottomNavigation(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
       ),
