@@ -171,10 +171,10 @@ class _NewRecipeState extends State<NewRecipe> {
   Widget build(BuildContext context) {
     List<XFile> imageInputImages = [];
     bool allowEditImageInput = true;
-    List<Topic> topics = [
-      Topic(title: 'Topic 1'),
-      Topic(title: 'Topic 2'),
-      Topic(title: 'Topic 3'),
+    List<Step> steps = [
+      Step(title: 'Passo 1'),
+      Step(title: 'Passo 2'),
+      Step(title: 'passo 3'),
     ];
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -269,21 +269,21 @@ class _NewRecipeState extends State<NewRecipe> {
               children: <Widget>[
                 ListView.builder(
                   shrinkWrap: true,
-                  itemCount: topics.length,
+                  itemCount: steps.length,
                   itemBuilder: (context, index) {
-                    Topic topic = topics[index];
+                    Step step = steps[index];
                     return ExpansionTile(
                       title: Text(
-                        topic.title,
+                        step.title,
                         style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w400,
                             color: black400),
                       ),
-                      initiallyExpanded: topic.isExpanded,
+                      initiallyExpanded: step.isExpanded,
                       onExpansionChanged: (expanded) {
                         setState(() {
-                          topic.isExpanded = expanded;
+                          step.isExpanded = expanded;
                         });
                       },
                       children: [
@@ -374,7 +374,7 @@ class _NewRecipeState extends State<NewRecipe> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16.0),
-        color: white,
+        color: backgroundColor,
         child: ElevatedButton(
           onPressed: () {
             Navigator.push(
@@ -405,8 +405,8 @@ class _NewRecipeState extends State<NewRecipe> {
   }
 }
 
-class Topic {
+class Step {
   String title;
   bool isExpanded;
-  Topic({required this.title, this.isExpanded = false});
+  Step({required this.title, this.isExpanded = false});
 }
