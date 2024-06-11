@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:front/utils/constants.dart';
+import 'package:front/views/RecipeList.dart';
+import '../components/BottomNavigation.dart';
 
 
 class Profile extends StatefulWidget {
@@ -12,6 +14,22 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = [
+    Profile(),
+    RecipeList(),
+  ];
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => _pages[index]),
+    );
+  }
 
   @override
   void initState() {
@@ -148,15 +166,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 4,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home, color: primaryColor,), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search , color: primaryColor), label: 'Explorar'),
-          BottomNavigationBarItem(icon: Icon(Icons.book, color: primaryColor), label: 'Receitas'),
-          BottomNavigationBarItem(icon: Icon(Icons.assignment, color: primaryColor), label: 'Missões'),
-          BottomNavigationBarItem(icon: Icon(Icons.person, color: primaryColor), label: 'Perfil'),
-        ],
+       bottomNavigationBar: BottomNavigation(
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
       ),
     );
   }
@@ -343,3 +355,5 @@ class AchievementItem extends StatelessWidget {
     );
   }
 }
+
+
