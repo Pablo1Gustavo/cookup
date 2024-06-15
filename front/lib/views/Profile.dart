@@ -121,7 +121,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     ),
                     SizedBox(height: screenHeight * 0.03),
                     const Text(
-                      'Fazedor de miojo na semana e chef nos feriados.',
+                      'Fazedor de miojo por paixão e chef nos feriados.',
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
