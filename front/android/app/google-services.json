@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "212980562016",
+    "project_id": "cookup-abbd8",
+    "storage_bucket": "cookup-abbd8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:212980562016:android:befebfa12276243331ab05",
+        "android_client_info": {
+          "package_name": "com.cookup"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA97m2WOLlxZ0uU0AK_20Caz5n63HT272Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:212980562016:android:db3eb3db96b6b9db31ab05",
+        "android_client_info": {
+          "package_name": "com.example.front"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA97m2WOLlxZ0uU0AK_20Caz5n63HT272Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,46 @@
+import 'package:flutter/material.dart';
+import 'package:front/services/auth_service.dart';
+import 'package:provider/provider.dart';
+
+class LogoutButton extends StatelessWidget {
+
+  const LogoutButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Align(
+        alignment: Alignment.topRight,
+        child: IconButton(
+          icon: Icon(Icons.logout, size: 40,),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Sair"),
+                  content: Text("Tem certeza que deseja sair?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("Cancel"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        context.read<AuthService>().logout();
+                      },
+                      child: Text("Sair"),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
