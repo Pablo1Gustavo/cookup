@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:country_flags/country_flags.dart';
+import 'package:front/components/LogoutButton.dart';
 import 'package:front/utils/constants.dart';
 import 'package:front/views/Mission_page.dart';
 import 'package:front/views/RecipeList.dart';
@@ -57,6 +58,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           Container(
             height: screenHeight * 0.13,
             color: primaryColor,
+            child: LogoutButton(),
           ),
           Column(
             children: [
@@ -357,5 +359,7 @@ class AchievementItem extends StatelessWidget {
     );
   }
 }
+
+
 
 

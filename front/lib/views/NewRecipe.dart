@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:front/components/AddItemBottomSheet.dart';
+import 'package:front/components/ImagePickerComponent.dart';
 import 'package:front/utils/constants.dart';
 import 'package:front/views/RecipeList.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class NewRecipe extends StatefulWidget {
   const NewRecipe({super.key});
@@ -21,124 +21,18 @@ class _NewRecipeState extends State<NewRecipe> {
   ];
   List<String> ingredients = [];
 
-  Future<void> _pickImage() async {
-    var status = await Permission.camera.request();
-    if (status.isGranted) {
-      final ImageSource? source = await showModalBottomSheet<ImageSource>(
-        context: context,
-        builder: (context) {
-          return Container(
-            height: 150,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                ListTile(
-                  leading: const Icon(Icons.camera),
-                  title: const Text('Abrir Câmera'),
-                  onTap: () {
-                    Navigator.of(context).pop(ImageSource.camera);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.image),
-                  title: const Text('Selecionar da Galeria'),
-                  onTap: () {
-                    Navigator.of(context).pop(ImageSource.gallery);
-                  },
-                ),
-              ],
-            ),
-          );
-        },
-      );
-
-      if (source != null) {
-        final picker = ImagePicker();
-        final pickedFile = await picker.pickImage(source: source);
-
-        setState(() {
-          selectedImage = pickedFile;
-        });
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("A permissão de Câmera é necessária!"),
-        ),
-      );
-    }
-  }
-
   Future<void> _showAddItemBottomSheet() async {
-    TextEditingController itemController = TextEditingController();
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: white,
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: itemController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50.0),
-                    ),
-                    hintText: 'Digite o nome do item',
-                    hintStyle: const TextStyle(color: black200),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      child: const Text(
-                        'Cancelar',
-                        style: TextStyle(
-                          fontSize: 12, 
-                          fontWeight: FontWeight.bold, 
-                          color: primaryColor,
-                        )
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    ElevatedButton(
-                      child: const Text(
-                        'Adicionar',
-                        style: TextStyle(
-                          fontSize: 12, 
-                          fontWeight: FontWeight.bold, 
-                          color: white,
-                        )
-                      ),
-                      onPressed: () {
-                        String newItem = itemController.text;
-                        // Adicione a lógica para adicionar o item
-                        print('Novo item: $newItem');
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor400
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+        return AddItemBottomSheet(
+          onItemAdded: (newItem) {
+            setState(() {
+              ingredients.add(newItem);
+            });
+          },
         );
       },
     );
@@ -188,7 +82,7 @@ class _NewRecipeState extends State<NewRecipe> {
     });
   }
 
-    void _removeIngredient(int index) {
+  void _removeIngredient(int index) {
     setState(() {
       ingredients.removeAt(index);
     });
@@ -201,7 +95,8 @@ class _NewRecipeState extends State<NewRecipe> {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(screenHeight * 0.08), // altura da app bar
+        preferredSize:
+            Size.fromHeight(screenHeight * 0.08), // altura da app bar
         child: Padding(
           padding: const EdgeInsets.only(top: 24.0), // padding superior
           child: AppBar(
@@ -228,48 +123,12 @@ class _NewRecipeState extends State<NewRecipe> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            SizedBox(
-              width: double.infinity,
-              child: Column(
-                children: [
-                  selectedImage == null
-                      ? const Text("Nenhuma imagem selecionada")
-                      : SizedBox(
-                          width: double.infinity,
-                          child: Image.file(
-                            File(selectedImage!.path),
-                            height: 200,
-                            width: double.infinity,
-                          ),
-                        ),
-                  ElevatedButton(
-                    onPressed: _pickImage,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: white,
-                      padding: const EdgeInsets.all(10.0),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add,
-                          size: 24,
-                          color: black400,
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Adicionar Imagem',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: black400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            ImagePickerComponent(
+              onImagePicked: (image) {
+                setState(() {
+                  selectedImage = image;
+                });
+              },
             ),
             const SizedBox(height: 10.0),
             TextField(
@@ -333,141 +192,142 @@ class _NewRecipeState extends State<NewRecipe> {
             ),
             const SizedBox(height: 10.0),
             Divider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: steps.length,
-                  itemBuilder: (context, index) {
-                    Step step = steps[index];
-                    return ExpansionTile(
-                      title: Text(
-                        step.title,
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w400,
-                            color: black400),
-                      ),
-                      initiallyExpanded: step.isExpanded,
-                      onExpansionChanged: (expanded) {
-                        setState(() {
-                          step.isExpanded = expanded;
-                        });
-                      },
-                      children: [
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: _showAddItemBottomSheet,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: white,
-                                        padding: const EdgeInsets.all(10.0),
-                                      ),
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.add,
-                                            size: 24,
-                                            color: black400,
-                                          ),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            'Adicionar Item',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
+            Expanded(
+              child: ListView(
+                children: <Widget>[
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: steps.length,
+                    itemBuilder: (context, index) {
+                      Step step = steps[index];
+                      return ExpansionTile(
+                        title: Text(
+                          step.title,
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w400,
+                              color: black400),
+                        ),
+                        initiallyExpanded: step.isExpanded,
+                        onExpansionChanged: (expanded) {
+                          setState(() {
+                            step.isExpanded = expanded;
+                          });
+                        },
+                        children: [
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: _showAddItemBottomSheet,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: white,
+                                          padding: const EdgeInsets.all(10.0),
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.add,
+                                              size: 24,
                                               color: black400,
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Item',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: black400,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: _showTimePicker,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: white,
-                                        padding: const EdgeInsets.all(10.0),
-                                      ),
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.timer,
-                                            size: 24,
-                                            color: black400,
-                                          ),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            'Adicionar Timer',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
+                              const SizedBox(width: 24),
+                              Expanded(
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: _showTimePicker,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: white,
+                                          padding: const EdgeInsets.all(10.0),
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.timer,
+                                              size: 24,
                                               color: black400,
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Timer',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: black400,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 24),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _removeStep(index),
-                            ),
-                          ],
-                        )
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: _addStep,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: white,
-                    padding: const EdgeInsets.all(10.0),
+                              const SizedBox(width: 24),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => _removeStep(index),
+                              ),
+                            ],
+                          )
+                        ],
+                      );
+                    },
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        size: 24,
-                        color: black400,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Adicionar Passo',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _addStep,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: white,
+                      padding: const EdgeInsets.all(10.0),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add,
+                          size: 24,
                           color: black400,
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 8),
+                        Text(
+                          'Adicionar Passo',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: black400,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -497,7 +357,7 @@ class _NewRecipeState extends State<NewRecipe> {
             style: TextStyle(
               fontSize: 14.0,
               fontWeight: FontWeight.bold,
-              color: white,
+              color: Colors.white,
             ),
           ),
         ),
