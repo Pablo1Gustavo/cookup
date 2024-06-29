@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:front/services/auth_service.dart";
 import "package:front/views/Login.dart";
 import "package:front/views/Profile.dart";
+import "package:front/views/HomePage.dart";
 import "package:provider/provider.dart";
 
 class AuthCheck extends StatefulWidget {
@@ -21,7 +22,7 @@ class _AuthCheckState extends State<AuthCheck> {
     else if (auth.usuario == null)
       return Login();
     else
-      return Profile();
+      return HomePage();
   }
 
   loading() {

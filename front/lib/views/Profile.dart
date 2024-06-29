@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:front/components/LogoutButton.dart';
 import 'package:front/utils/constants.dart';
+import 'package:front/views/HomePage.dart';
 import 'package:front/views/Mission_page.dart';
 import 'package:front/views/RecipeList.dart';
 import '../components/BottomNavigation.dart';
@@ -19,6 +20,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
+    HomePage(),
     Profile(),
     RecipeList(),
     MissoesPage(),

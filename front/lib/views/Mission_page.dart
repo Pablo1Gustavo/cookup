@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front/views/HomePage.dart';
 import 'package:front/views/Profile.dart';
 import 'package:front/views/RecipeList.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,7 @@ class _MissoesPageState extends State<MissoesPage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
+    HomePage(),
     Profile(),
     RecipeList(),
     MissoesPage(),
@@ -57,9 +59,9 @@ class _MissoesPageState extends State<MissoesPage> {
           ],
         ),
         bottomNavigationBar: BottomNavigation(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
-      ),
+          currentIndex: _currentIndex,
+          onTap: _onTabTapped,
+        ),
       ),
     );
   }
