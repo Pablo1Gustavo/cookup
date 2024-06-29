@@ -25,6 +25,10 @@ class _BottomNavigationState extends State<BottomNavigation> {
       onTap: widget.onTap,
       items: const [
         BottomNavigationBarItem(
+          icon: Icon(Icons.home, color: primaryColor),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.person, color: primaryColor),
           label: 'Perfil',
         ),
