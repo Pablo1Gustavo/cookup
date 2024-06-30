@@ -57,10 +57,16 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<void> updateUsername(String uid, String username) async {
-    await _firestore.collection('usuarios').doc(uid).set({
-      'username': username,
-    }, SetOptions(merge: true));
+  Future<void> updateUsername(String uid, String newUsername) async {
+    try {
+      await _firestore.collection('usuarios').doc(uid).set({
+        'username': newUsername,
+      }, SetOptions(merge: true));
+      username = newUsername;
+      notifyListeners();
+    } catch (e) {
+      print("Erro ao atualizar nome de usuário: $e");
+    }
   }
 
 
