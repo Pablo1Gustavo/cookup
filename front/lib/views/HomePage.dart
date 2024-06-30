@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:front/components/BottomNavigation.dart';
+import 'package:front/components/NewPostCard.dart';
 import 'package:front/models/post.dart';
 import 'package:front/components/PostCard.dart';
 import 'package:front/views/Profile.dart';
@@ -14,7 +15,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentIndex = 0;
 
@@ -23,7 +25,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       username: 'Pedro Calafange',
       date: '14/04/2024',
       time: '22:10',
-      imageUrl: 'https://www.minhareceita.com.br/app/uploads/2022/12/pizza-de-pepperoni-caseira-portal-minha-receita.jpg',
+      imageUrl:
+          'https://www.minhareceita.com.br/app/uploads/2022/12/pizza-de-pepperoni-caseira-portal-minha-receita.jpg',
       title: 'Pizza de Frango',
       description:
           'Boa noite gente, hoje saiu essa linda pizza. Para quem também quiser fazer eu cadastrei a receita!',
@@ -32,7 +35,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       username: 'Pablo Silva',
       date: '14/04/2024',
       time: '22:10',
-      imageUrl: 'https://img.band.uol.com.br/image/2023/09/25/salada-1549_800x450.webp',
+      imageUrl:
+          'https://img.band.uol.com.br/image/2023/09/25/salada-1549_800x450.webp',
       title: 'Salada',
       description:
           'Deliciosa salada com morangos e nozes. Super saudável e fácil de fazer!',
@@ -73,7 +77,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Padding(
-        padding: EdgeInsets.only(top: 80.0, left: 16.0, right: 16.0), 
+        padding: EdgeInsets.only(top: 80.0, left: 16.0, right: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -100,49 +104,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       bottomNavigationBar: BottomNavigation(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
-      ),
-    );
-  }
-}
-
-class NewPostCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4.0, 
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Olá Marcos',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  'O que vai compartilhar hoje?',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-              ],
-            ),
-            IconButton(
-              onPressed: () {
-                
-              },
-              icon: Icon(Icons.add),
-              style: TextButton.styleFrom(
-                backgroundColor: primaryColor,
-                iconColor: white,
-                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0), 
-                alignment: Alignment.center 
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:front/components/LogoutButton.dart';
+import 'package:front/components/NomeUsuarioCard.dart';
+import 'package:front/components/Username.dart';
 import 'package:front/utils/constants.dart';
 import 'package:front/views/HomePage.dart';
 import 'package:front/views/Mission_page.dart';
 import 'package:front/views/RecipeList.dart';
 import '../components/BottomNavigation.dart';
-
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -48,10 +51,32 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
+  void changeName() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return NomeUsuarioCard(
+          onSubmit: (username) async {
+            // Salvar o nome de usuário no Firestore
+            User? user = FirebaseAuth.instance.currentUser;
+            if (user != null) {
+              await FirebaseFirestore.instance
+                  .collection('usuarios')
+                  .doc(user.uid)
+                  .set({'username': username}, SetOptions(merge: true));
+            }
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -71,26 +96,25 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     SizedBox(height: screenHeight * 0.08),
                     CircleAvatar(
                       radius: screenHeight * 0.05,
-                      backgroundImage: const NetworkImage('https://i.pinimg.com/564x/57/e4/60/57e4605cc710914108c49482bdda1366.jpg'),
+                      backgroundImage: const NetworkImage(
+                          'https://i.pinimg.com/564x/57/e4/60/57e4605cc710914108c49482bdda1366.jpg'),
                     ),
                     const SizedBox(height: 10),
-                    const Text(
-                      'Marcos D. Pedro',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
+                    UserProfile(),
                     SizedBox(
                       width: screenWidth * 0.3,
                       height: screenHeight * 0.03,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Ação ao clicar no botão Editar
+                          changeName();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
                         ),
                         child: const Text('Editar',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
-                        ),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.03),
@@ -99,25 +123,33 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       children: [
                         Column(
                           children: [
-                            Text('200', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text('200',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
                             Text('Pontos'),
                           ],
                         ),
                         Column(
                           children: [
-                            Text('400', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text('400',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
                             Text('Receitas'),
                           ],
                         ),
                         Column(
                           children: [
-                            Text('200', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text('200',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
                             Text('Seguidores'),
                           ],
                         ),
                         Column(
                           children: [
-                            Text('200', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text('200',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
                             Text('Seguindo'),
                           ],
                         ),
@@ -134,7 +166,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.location_pin, color: Colors.red),
-                        const Text('De Natal, Brasil', style: TextStyle(fontSize: 16)),
+                        const Text('De Natal, Brasil',
+                            style: TextStyle(fontSize: 16)),
                         const SizedBox(width: 5),
                         CountryFlag.fromCountryCode(
                           'BR',
@@ -220,7 +253,9 @@ class FeedTab extends StatelessWidget {
       children: List.generate(10, (index) {
         return Padding(
           padding: const EdgeInsets.all(2.0),
-          child: Image.network('https://i.pinimg.com/564x/8d/71/c2/8d71c2cb56287e22643f20f53a2cac81.jpg', fit: BoxFit.cover),
+          child: Image.network(
+              'https://i.pinimg.com/564x/8d/71/c2/8d71c2cb56287e22643f20f53a2cac81.jpg',
+              fit: BoxFit.cover),
         );
       }),
     );
@@ -239,7 +274,8 @@ class SavedRecipesTab extends StatelessWidget {
           recipes: List.generate(3, (index) {
             return SavedRecipeItem(
               title: 'Sushi',
-              imageUrl: 'https://img.freepik.com/free-photo/maki-roll-with-cucumber-served-with-sauce-sesame-seeds_141793-790.jpg?t=st=1717690607~exp=1717694207~hmac=daa02204027a98f82a4f2156d615db3093825d5dce198adf2f461d3ce18d1fc6&w=740',
+              imageUrl:
+                  'https://img.freepik.com/free-photo/maki-roll-with-cucumber-served-with-sauce-sesame-seeds_141793-790.jpg?t=st=1717690607~exp=1717694207~hmac=daa02204027a98f82a4f2156d615db3093825d5dce198adf2f461d3ce18d1fc6&w=740',
               index: index,
               totalItems: 3,
             );
@@ -250,7 +286,8 @@ class SavedRecipesTab extends StatelessWidget {
           recipes: List.generate(3, (index) {
             return SavedRecipeItem(
               title: 'Pizza',
-              imageUrl: 'https://img.freepik.com/free-photo/slice-crispy-pizza-with-meat-cheese_140725-6974.jpg?t=st=1717690586~exp=1717694186~hmac=7718023e64f9a62503a096c37a26115a68bf743c48ccd7ab37945142eda5ccc9&w=740',
+              imageUrl:
+                  'https://img.freepik.com/free-photo/slice-crispy-pizza-with-meat-cheese_140725-6974.jpg?t=st=1717690586~exp=1717694186~hmac=7718023e64f9a62503a096c37a26115a68bf743c48ccd7ab37945142eda5ccc9&w=740',
               index: index,
               totalItems: 3,
             );
@@ -261,7 +298,8 @@ class SavedRecipesTab extends StatelessWidget {
           recipes: List.generate(3, (index) {
             return SavedRecipeItem(
               title: 'Cuixcuix',
-              imageUrl: 'https://img.freepik.com/premium-photo/cuscuz-with-cheese-typical-northeastern-food-white-plate-wooden-table_66339-373.jpg?w=996',
+              imageUrl:
+                  'https://img.freepik.com/premium-photo/cuscuz-with-cheese-typical-northeastern-food-white-plate-wooden-table_66339-373.jpg?w=996',
               index: index,
               totalItems: 3,
             );
@@ -276,7 +314,8 @@ class SavedRecipeCategory extends StatelessWidget {
   final String title;
   final List<SavedRecipeItem> recipes;
 
-  const SavedRecipeCategory({super.key, required this.title, required this.recipes});
+  const SavedRecipeCategory(
+      {super.key, required this.title, required this.recipes});
 
   @override
   Widget build(BuildContext context) {
@@ -287,7 +326,9 @@ class SavedRecipeCategory extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text(title,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           SizedBox(
             height: 300,
@@ -308,7 +349,12 @@ class SavedRecipeItem extends StatelessWidget {
   final int index;
   final int totalItems;
 
-  const SavedRecipeItem({super.key, required this.title, required this.imageUrl, required this.index, required this.totalItems});
+  const SavedRecipeItem(
+      {super.key,
+      required this.title,
+      required this.imageUrl,
+      required this.index,
+      required this.totalItems});
 
   @override
   Widget build(BuildContext context) {
@@ -321,18 +367,24 @@ class SavedRecipeItem extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
-              child: Image.network(imageUrl, fit: BoxFit.cover, height: 250, width: 420),
+              child: Image.network(imageUrl,
+                  fit: BoxFit.cover, height: 250, width: 420),
             ),
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: Container(
-                color: Colors.black.withOpacity(0.6), // Semi-transparent background
-                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                color: Colors.black
+                    .withOpacity(0.6), // Semi-transparent background
+                padding:
+                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                 child: Text(
                   title,
-                  style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -349,7 +401,12 @@ class AchievementItem extends StatelessWidget {
   final String points;
   final IconData icon;
 
-  const AchievementItem({super.key, required this.title, required this.date, required this.points, required this.icon});
+  const AchievementItem(
+      {super.key,
+      required this.title,
+      required this.date,
+      required this.points,
+      required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -357,11 +414,8 @@ class AchievementItem extends StatelessWidget {
       leading: Icon(icon, color: Colors.green),
       title: Text(title),
       subtitle: Text(date),
-      trailing: Text(points, style: const TextStyle(color: Colors.orange, fontSize: 14)),
+      trailing: Text(points,
+          style: const TextStyle(color: Colors.orange, fontSize: 14)),
     );
   }
 }
-
-
-
-
