@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:front/components/NomeUsuarioCard.dart';
 import 'package:front/services/auth_service.dart';
 import 'package:front/views/Cadastro.dart';
 import 'package:provider/provider.dart';
@@ -62,16 +65,30 @@ class _LoginState extends State<Login> {
   registrar() async {
     setState(() => loading = true);
     try {
-      await context
-          .read<AuthService>()
-          .registrar(_emailController.text, _senhaController.text);
+      await context.read<AuthService>().registrar(_emailController.text, _senhaController.text);
+
+      // Mostrar o card para o nome de usuário
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return NomeUsuarioCard(
+            onSubmit: (username) async {
+              // Salvar o nome de usuário no Firestore
+              User? user = FirebaseAuth.instance.currentUser;
+              if (user != null) {
+                await context.read<AuthService>().updateUsername(user.uid, username);
+                Navigator.of(context).pop(); // Fechar o diálogo após salvar
+              }
+            },
+          );
+        },
+      );
     } on AuthException catch (e) {
       setState(() => loading = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
