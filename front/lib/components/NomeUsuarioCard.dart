@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:front/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class NomeUsuarioCard extends StatefulWidget {
   final void Function(String) onSubmit;
@@ -51,9 +53,14 @@ class _NomeUsuarioCardState extends State<NomeUsuarioCard> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     widget.onSubmit(_usernameController.text.trim());
+                    context.read<AuthService>().updateUsername(
+                      context.read<AuthService>().usuario!.uid,
+                      _usernameController.text.trim(),
+                    ); // Atualiza o nome do usuário no AuthService
                     Navigator.of(context).pop();
                   }
                 },
+
                 child: Text('Confirmar'),
               ),
             ],
