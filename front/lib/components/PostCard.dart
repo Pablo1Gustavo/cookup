@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:front/utils/constants.dart';
 
 class PostCard extends StatelessWidget {
@@ -53,44 +54,47 @@ class PostCard extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.bottomLeft,
                 children: [
-                Image.network(
+                  Image.network(
                     imageUrl,
                     width: double.infinity,
                     height: 200.0,
                     fit: BoxFit.cover,
                   ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      color: Colors.black.withOpacity(0.5),
-                      child: Row (
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(width: 24.0),
-                              Text(
-                                title,
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
+                  SizedBox(
+                    width: double.infinity,
+                    height: 200,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.black, Colors.transparent],
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter
+                        ),
+                      ),
+                    child: Row (
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 18.0, top: 18.0, left: 24.0, right: 0),
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                          CustomIconButton(
-                            onPressed: () => {
+                        ),
+                        CustomIconButton(
+                          onPressed: () => {
 
-                            },
-                          ),
-                        ]
-                          
-                      )
+                          },
+                        ),
+                      ],
                     ),
-                  ),
+                  )
+                ),
                 ],
               ),
             ),   
@@ -122,9 +126,14 @@ class CustomIconButton extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), 
+        padding: EdgeInsets.only( top: 12.0, bottom: 8.0, left: 18.0, right: 8.0),        
         child: IconButton(
-          icon: Icon(Icons.bookmark_add_outlined, size: 30.0),
+            icon: SvgPicture.asset(
+              'assets/book_plus.svg',
+              width: 30.0,
+              height: 30.0,
+              fit: BoxFit.cover,
+            ),
           color: Colors.white,
           onPressed: onPressed,
         ),
