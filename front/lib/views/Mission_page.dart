@@ -82,13 +82,11 @@ class _MissoesTabState extends State<MissoesTab> {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        // Aqui você pode adicionar widgets para as missões
         ExploreMissionsCard(imageUrl: 'assets/cow_cheff.png',),
         SizedBox(height: screenHeight * 0.02),
         CheckInDiarioCard(),
         SizedBox(height: screenHeight * 0.02),
         ReceitaDoDiaCard(imageUrl: 'assets/alfajor.png',rating: 3,recipeName: 'ALFAJOR',xpPoints: 222, )
-        // Adicione mais cards conforme necessário
       ],
     );
   }
