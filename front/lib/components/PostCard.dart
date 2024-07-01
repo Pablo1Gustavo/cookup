@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:front/utils/constants.dart';
+import 'package:front/components/SaveUnsaveRecipeButton.dart';
+import 'package:front/models/post.dart';
 
 class PostCard extends StatelessWidget {
-  final String username;
-  final String date;
-  final String time;
-  final String imageUrl;
-  final String title;
-  final String description;
+  final Post post;
 
   PostCard({
-    required this.username,
-    required this.date,
-    required this.time,
-    required this.imageUrl,
-    required this.title,
-    required this.description,
+    required this.post,
   });
+  
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +21,7 @@ class PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
                 CircleAvatar(
                   backgroundImage: NetworkImage('https://cdn.pixabay.com/photo/2014/03/25/16/54/user-297566_640.png'),
@@ -40,10 +31,10 @@ class PostCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      username,
+                      'username',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text('$date • $time'),
+                    Text('date • time'),
                   ],
                 ),
               ],
@@ -55,7 +46,7 @@ class PostCard extends StatelessWidget {
                 alignment: Alignment.bottomLeft,
                 children: [
                   Image.network(
-                    imageUrl,
+                    post.imageUrl,
                     width: double.infinity,
                     height: 200.0,
                     fit: BoxFit.cover,
@@ -78,7 +69,7 @@ class PostCard extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(bottom: 18.0, top: 18.0, left: 24.0, right: 0),
                           child: Text(
-                            title,
+                            'title',
                             style: TextStyle(
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
@@ -86,10 +77,10 @@ class PostCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        CustomIconButton(
-                          onPressed: () => {
-
-                          },
+                        SaveUnsaveRecipeButton(
+                          borderRadius: BorderRadius.only( topLeft: Radius.circular(50.0), ),
+                          padding: EdgeInsets.only( top: 12.0, bottom: 8.0, left: 18.0, right: 8.0),  
+                          receitaUID: post.receitaRef?.id ?? "",
                         ),
                       ],
                     ),
@@ -100,42 +91,10 @@ class PostCard extends StatelessWidget {
             ),   
             SizedBox(height: 10.0),
             Text(
-              description,
+              post.descricao,
               style: TextStyle(fontSize: 16.0),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-
-class CustomIconButton extends StatelessWidget {
-  final VoidCallback onPressed;
-
-  CustomIconButton({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: primaryColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(50.0),
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.only( top: 12.0, bottom: 8.0, left: 18.0, right: 8.0),        
-        child: IconButton(
-            icon: SvgPicture.asset(
-              'assets/book_plus.svg',
-              width: 30.0,
-              height: 30.0,
-              fit: BoxFit.cover,
-            ),
-          color: Colors.white,
-          onPressed: onPressed,
         ),
       ),
     );
