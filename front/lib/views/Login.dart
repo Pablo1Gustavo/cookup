@@ -73,11 +73,17 @@ class _LoginState extends State<Login> {
         barrierDismissible: false,
         builder: (context) {
           return NomeUsuarioCard(
-            onSubmit: (username) async {
-              // Salvar o nome de usuário no Firestore
+            onSubmit: (username, descricaoPerfil, fotoPerfil) async {
+              // Salvar o nome de usuário e outros campos no Firestore
               User? user = FirebaseAuth.instance.currentUser;
               if (user != null) {
-                await context.read<AuthService>().updateUsername(user.uid, username);
+                await context.read<AuthService>().updateUserData(
+                  user.uid,
+                  username: username,
+                  pontos: 0, // Valor inicial para pontos
+                  descricaoPerfil: descricaoPerfil,
+                  fotoPerfil: fotoPerfil,
+                );
                 Navigator.of(context).pop(); // Fechar o diálogo após salvar
               }
             },
@@ -89,6 +95,7 @@ class _LoginState extends State<Login> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;

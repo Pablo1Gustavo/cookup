@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:front/components/CheckInDiarioCard.dart';
 import 'package:front/views/HomePage.dart';
 import 'package:front/views/Profile.dart';
 import 'package:front/views/RecipeList.dart';
-import 'package:intl/intl.dart';
 
 import '../components/BottomNavigation.dart';
 import '../utils/constants.dart';
@@ -78,7 +78,6 @@ class _MissoesTabState extends State<MissoesTab> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return ListView(
       padding: const EdgeInsets.all(16.0),
@@ -144,87 +143,6 @@ class Achievement extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(subtitle),
-      ),
-    );
-  }
-}
-
-class CheckInDiarioCard extends StatefulWidget {
-  const CheckInDiarioCard({Key? key}) : super(key: key);
-
-  @override
-  _CheckInDiarioCardState createState() => _CheckInDiarioCardState();
-}
-
-class _CheckInDiarioCardState extends State<CheckInDiarioCard> {
-  List<String> _weekDays = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentWeek();
-  }
-
-  void _getCurrentWeek() {
-    DateTime now = DateTime.now();
-    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1)); // Start of the week (Monday)
-    _weekDays = List.generate(7, (index) {
-      DateTime day = startOfWeek.add(Duration(days: index));
-      return DateFormat('dd/MM').format(day);
-    });
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.orange[100], // Ajuste a cor conforme necessário
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Check-in Diário',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: primaryColor,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Acumule pontos diariamente e compre novas skins',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: primaryColor,
-              ),
-            ),
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(7, (index) {
-                return Column(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: index == 0 ? Colors.green : Colors.grey[300],
-                      child: Text(
-                        '+${(index + 1) * 2}',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      _weekDays.isNotEmpty ? _weekDays[index] : '',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                    ),
-                  ],
-                );
-              }),
-            ),
-          ],
-        ),
       ),
     );
   }

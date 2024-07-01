@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:front/models/receita.dart';
+import 'package:front/services/auth_service.dart';
 import 'package:front/utils/constants.dart';
 import 'package:front/views/RecipeList.dart';
+import 'package:provider/provider.dart';
 
 class RecipeFinished extends StatefulWidget {
   final int totalTimeInSeconds;
@@ -37,7 +39,10 @@ class _RecipeFinishedState extends State<RecipeFinished> {
       message = "Você demorou um pouco mais!";
       score = (widget.receita.pontuacao * 0.9).round();
     }
+    context.read<AuthService>().adicionarPontosPorReceita(score);
   }
+
+
 
   void _publishRecipe() {
     // Implementar ação de publicar receita
