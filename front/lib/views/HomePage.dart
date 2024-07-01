@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:front/components/BottomNavigation.dart';
 import 'package:front/components/NewPostCard.dart';
@@ -19,29 +20,6 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentIndex = 0;
-
-  final List<Post> posts = [
-    Post(
-      username: 'Pedro Calafange',
-      date: '14/04/2024',
-      time: '22:10',
-      imageUrl:
-          'https://www.minhareceita.com.br/app/uploads/2022/12/pizza-de-pepperoni-caseira-portal-minha-receita.jpg',
-      title: 'Pizza de Frango',
-      description:
-          'Boa noite gente, hoje saiu essa linda pizza. Para quem também quiser fazer eu cadastrei a receita!',
-    ),
-    Post(
-      username: 'Pablo Silva',
-      date: '14/04/2024',
-      time: '22:10',
-      imageUrl:
-          'https://img.band.uol.com.br/image/2023/09/25/salada-1549_800x450.webp',
-      title: 'Salada',
-      description:
-          'Deliciosa salada com morangos e nozes. Super saudável e fácil de fazer!',
-    ),
-  ];
 
   final List<Widget> _pages = [
     HomePage(),
@@ -84,16 +62,23 @@ class _HomePageState extends State<HomePage>
             NewPostCard(),
             SizedBox(height: 16.0),
             Expanded(
-              child: ListView.builder(
-                itemCount: posts.length,
-                itemBuilder: (context, index) {
-                  return PostCard(
-                    username: posts[index].username,
-                    date: posts[index].date,
-                    time: posts[index].time,
-                    imageUrl: posts[index].imageUrl,
-                    title: posts[index].title,
-                    description: posts[index].description,
+              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance.collection('postagens').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Ocorreu um erro ao carregar as postagens.'));
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  final posts = snapshot.data!.docs.map((doc) => Post.fromDocument(doc)).toList();
+                  return ListView.builder(
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) {
+                      return PostCard(
+                          post: posts[index],
+                      );
+                    }
                   );
                 },
               ),

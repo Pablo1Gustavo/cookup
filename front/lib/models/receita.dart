@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class Receita {
+  final String? uid;
   final String nome;
   final String imagemUrl;
   final int pontuacao;
@@ -11,6 +11,7 @@ class Receita {
   final DocumentReference<Map<String, dynamic>>? usuarioRef;
 
   Receita({
+    this.uid,
     required this.nome,
     required this.imagemUrl,
     required this.pontuacao,
@@ -35,6 +36,7 @@ class Receita {
   factory Receita.fromDocument(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
     return Receita(
+      uid: doc.id,
       nome: data['nome'],
       imagemUrl: data['image_url'],
       pontuacao: data['pontuacao'],

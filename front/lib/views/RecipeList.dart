@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:front/components/SaveUnsaveRecipeButton.dart';
 import 'package:front/models/receita.dart';
 import 'package:front/utils/constants.dart';
 import 'package:front/views/HomePage.dart';
@@ -8,7 +9,6 @@ import 'package:front/views/NewRecipe.dart';
 import 'package:front/views/RecipeDetails.dart';
 import '../components/BottomNavigation.dart';
 import 'Profile.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class RecipeList extends StatefulWidget {
   const RecipeList({super.key});
@@ -225,45 +225,14 @@ class RecipeCard extends StatelessWidget {
               Positioned(
                 top: 0,
                 right: 0,
-                child: CustomIconButton(
-                  onPressed: () {
-                    // ação do botão
-                  },
+                child:  SaveUnsaveRecipeButton(
+                  borderRadius: BorderRadius.only( bottomLeft: Radius.circular(50.0), ),
+                  padding: EdgeInsets.only(top: 4.0, bottom: 12.0, left: 16.0, right: 8.0),
+                  receitaUID: receita.uid ?? "",
                 ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class CustomIconButton extends StatelessWidget {
-  final VoidCallback onPressed;
-
-  const CustomIconButton({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: primaryColor100,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(50.0),
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(top: 4.0, bottom: 12.0, left: 16.0, right: 8.0),
-        child: IconButton(
-          icon: SvgPicture.asset(
-            'assets/book_check.svg',
-            width: 30.0,
-            height: 30.0,
-            fit: BoxFit.cover,
-          ),
-          color: Colors.white,
-          onPressed: onPressed,
         ),
       ),
     );

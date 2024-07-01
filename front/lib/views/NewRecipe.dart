@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:front/components/EditableList.dart';
 import 'package:front/views/RecipeList.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:front/components/AddItemBottomSheet.dart';
@@ -203,15 +204,17 @@ class _NewRecipeState extends State<NewRecipe> {
                   },
                 ),
                 const SizedBox(height: 24.0),
-                BoxIngredients(
-                  ingredients: ingredients,
+                EditableList(
+                  list: ingredients,
+                  nameOfList: 'Ingrediente',
                   onAdd: _showAddItemBottomSheet,
                   onRemove: (index) => _removeIngredient(index),
                 ),
                 const SizedBox(height: 10.0),
                 Divider(),
-                BoxSteps(
-                  passos: passos,
+                EditableList(
+                  list: passos,
+                  nameOfList: 'Passo',
                   onAdd: _showAddStepBottomSheet,
                   onRemove: (index) => _removePasso(index),
                 ),
@@ -258,92 +261,6 @@ class CustomBottomNavigationBar extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class BoxIngredients extends StatelessWidget {
-  final List<String> ingredients;
-  final Function(int) onRemove;
-  final VoidCallback onAdd;
-
-  const BoxIngredients({
-    required this.ingredients,
-    required this.onRemove,
-    required this.onAdd,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text('Ingredientes', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8.0),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: ingredients.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(ingredients[index]),
-              trailing: IconButton(
-                icon: Icon(Icons.remove_circle),
-                onPressed: () => onRemove(index),
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 8.0),
-        ElevatedButton(
-          onPressed: onAdd,
-          child: Text('Adicionar Ingrediente'),
-        ),
-      ],
-    );
-  }
-}
-
-class BoxSteps extends StatelessWidget {
-  final List<String> passos;
-  final Function(int) onRemove;
-  final VoidCallback onAdd;
-
-  const BoxSteps({
-    required this.passos,
-    required this.onRemove,
-    required this.onAdd,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text('Passos', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8.0),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: passos.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(passos[index]),
-              trailing: IconButton(
-                icon: Icon(Icons.remove_circle),
-                onPressed: () => onRemove(index),
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 8.0),
-        ElevatedButton(
-          onPressed: onAdd,
-          child: Text('Adicionar Passo'),
-        ),
-      ],
     );
   }
 }
