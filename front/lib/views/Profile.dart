@@ -8,7 +8,7 @@ import 'package:front/components/Username.dart';
 import 'package:front/services/auth_service.dart';
 import 'package:front/utils/constants.dart';
 import 'package:front/views/HomePage.dart';
-import 'package:front/views/Mission_page.dart';
+import 'package:front/views/MissionPage.dart';
 import 'package:front/views/RecipeList.dart';
 import 'package:provider/provider.dart';
 import '../components/BottomNavigation.dart';
