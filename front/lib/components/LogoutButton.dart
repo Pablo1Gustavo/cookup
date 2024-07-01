@@ -28,9 +28,11 @@ class LogoutButton extends StatelessWidget {
                       child: Text("Cancel"),
                     ),
                     TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        context.read<AuthService>().logout();
+                      onPressed: () async {
+                        await Provider.of<AuthService>(context, listen: false).logout();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => AuthCheck()),
+                        );
                       },
                       child: Text("Sair"),
                     ),

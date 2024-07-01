@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:front/views/HomePage.dart';
+import 'package:front/views/Login.dart';
+import 'package:provider/provider.dart';
 
 class AuthException implements Exception {
   String message;
@@ -16,7 +19,6 @@ class AuthService extends ChangeNotifier {
   int? pontos;
   String? descricaoPerfil;
   String? fotoPerfil;
-  List<DateTime>? checkInDates;
 
   AuthService() {
     _authCheck();
@@ -24,13 +26,23 @@ class AuthService extends ChangeNotifier {
 
   _authCheck() {
     _auth.authStateChanges().listen((User? user) {
-      usuario = (user == null) ? null : user;
+      usuario = user;
       if (user != null) {
         _loadUserData();
+      } else {
+        _clearUserData();
       }
       isLoading = false;
       notifyListeners();
     });
+  }
+
+    void _clearUserData() {
+    usuario = null;
+    username = null;
+    pontos = null;
+    descricaoPerfil = null;
+    fotoPerfil = null;
   }
 
   _getUser() {
@@ -42,80 +54,46 @@ class AuthService extends ChangeNotifier {
       pontos = null;
       descricaoPerfil = null;
       fotoPerfil = null;
-      checkInDates = null;
     }
     notifyListeners();
   }
 
-  Future<void> _loadUserData() async {
+Future<void> _loadUserData() async {
     if (usuario != null) {
       try {
         DocumentSnapshot userDoc = await _firestore.collection('usuarios').doc(usuario!.uid).get();
-        print("Documento do usuário: ${userDoc.data()}");
         if (userDoc.exists) {
           username = userDoc['username'];
           pontos = userDoc['pontos'];
           descricaoPerfil = userDoc['descricaoPerfil'];
           fotoPerfil = userDoc['fotoPerfil'];
-          checkInDates = (userDoc['checkInDates'] as List<dynamic>?)
-              ?.map((timestamp) => (timestamp as Timestamp).toDate())
-              .toList();
-          print("Dados do usuário carregados: $username, $pontos, $descricaoPerfil, $fotoPerfil");
         } else {
-          print("Documento do usuário não encontrado");
-          username = null;
-          pontos = null;
-          descricaoPerfil = null;
-          fotoPerfil = null;
-          checkInDates = null;
+          _clearUserData();
         }
       } catch (e) {
         print("Erro ao carregar dados do usuário: $e");
-        username = null;
-        pontos = null;
-        descricaoPerfil = null;
-        fotoPerfil = null;
+        _clearUserData();
       }
       isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> updateUserData(String uid, {String? username, int? pontos, String? descricaoPerfil, String? fotoPerfil, List<DateTime>? checkInDates}) async {
+  Future<void> updateUserData(String uid, {String? username, int? pontos, String? descricaoPerfil, String? fotoPerfil}) async {
     Map<String, dynamic> data = {};
     if (username != null) data['username'] = username;
     if (pontos != null) data['pontos'] = pontos;
     if (descricaoPerfil != null) data['descricaoPerfil'] = descricaoPerfil;
     if (fotoPerfil != null) data['fotoPerfil'] = fotoPerfil;
-    if (checkInDates != null) data['checkInDates'] = checkInDates;
 
     await _firestore.collection('usuarios').doc(uid).set(data, SetOptions(merge: true));
     if (username != null) this.username = username;
     if (pontos != null) this.pontos = pontos;
     if (descricaoPerfil != null) this.descricaoPerfil = descricaoPerfil;
     if (fotoPerfil != null) this.fotoPerfil = fotoPerfil;
-    if (checkInDates != null) this.checkInDates = checkInDates;
     notifyListeners();
   }
 
-  Future<void> registrarCheckInDiario() async {
-    if (usuario != null) {
-      DateTime now = DateTime.now();
-      DateTime today = DateTime(now.year, now.month, now.day);
-
-      if (checkInDates == null) {
-        checkInDates = [];
-      }
-
-      bool alreadyCheckedInToday = checkInDates!.any((date) => date.isAtSameMomentAs(today));
-
-      if (!alreadyCheckedInToday) {
-        int newPontos = (pontos ?? 0) + 2; // Adiciona 2 pontos por check-in diário
-        checkInDates!.add(today);
-        await updateUserData(usuario!.uid, pontos: newPontos, checkInDates: checkInDates);
-      }
-    }
-  }
 
   registrar(String email, String senha) async {
     try {
@@ -145,19 +123,38 @@ class AuthService extends ChangeNotifier {
   }
 
 Future<void> logout() async {
-    await _auth.signOut();
-    username = null;
-    pontos = null;
-    descricaoPerfil = null;
-    fotoPerfil = null;
-    checkInDates = null;
-    _getUser();
-  }
+  await _auth.signOut();
+}
+
 
   Future<void> adicionarPontosPorReceita(int pontosRecebidos) async {
     if (usuario != null) {
       int novosPontos = (pontos ?? 0) + pontosRecebidos;
       await updateUserData(usuario!.uid, pontos: novosPontos);
     }
+  }
+}
+
+
+class AuthCheck extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    AuthService auth = Provider.of<AuthService>(context);
+
+    if (auth.isLoading) {
+      return loading();
+    } else if (auth.usuario == null) {
+      return Login();
+    } else {
+      return HomePage();
+    }
+  }
+
+  Widget loading() {
+    return Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 }

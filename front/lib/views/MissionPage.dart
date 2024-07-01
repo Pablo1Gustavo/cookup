@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:front/components/CheckInDiarioCard.dart';
+import 'package:front/services/auth_service.dart';
 import 'package:front/views/HomePage.dart';
 import 'package:front/views/Profile.dart';
 import 'package:front/views/RecipeList.dart';
+import 'package:provider/provider.dart';
 
 import '../components/BottomNavigation.dart';
 import '../utils/constants.dart';
@@ -82,11 +84,18 @@ class _MissoesTabState extends State<MissoesTab> {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        ExploreMissionsCard(imageUrl: 'assets/cow_cheff.png',),
+        ExploreMissionsCard(
+          imageUrl: 'assets/cow_cheff.png',
+        ),
         SizedBox(height: screenHeight * 0.02),
         CheckInDiarioCard(),
         SizedBox(height: screenHeight * 0.02),
-        ReceitaDoDiaCard(imageUrl: 'assets/alfajor.png',rating: 3,recipeName: 'ALFAJOR',xpPoints: 222, )
+        ReceitaDoDiaCard(
+          imageUrl: 'assets/alfajor.png',
+          rating: 3,
+          recipeName: 'ALFAJOR',
+          xpPoints: 222,
+        )
       ],
     );
   }
@@ -104,7 +113,7 @@ class ConquistasTab extends StatelessWidget {
           icon: Icons.star,
           title: 'Fez o primeiro sushi',
           subtitle: '20/04/2023 - +10XP',
-        ),        
+        ),
         Achievement(
           icon: Icons.star,
           title: 'Comida Brasileira Nível 1',
@@ -136,8 +145,12 @@ class Achievement extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: Icon(icon, color: Colors.yellowAccent,),
-        title: Text(title,
+        leading: Icon(
+          icon,
+          color: Colors.yellowAccent,
+        ),
+        title: Text(
+          title,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(subtitle),
@@ -149,16 +162,19 @@ class Achievement extends StatelessWidget {
 class ExploreMissionsCard extends StatelessWidget {
   final String imageUrl;
 
-  const ExploreMissionsCard({Key? key, required this.imageUrl}) : super(key: key);
+  const ExploreMissionsCard({Key? key, required this.imageUrl})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final authService = context.watch<AuthService>();
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Profile()), // Substitua NewPage pela sua página de destino
-        );
+        print(authService.username);
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => Profile()), // Substitua NewPage pela sua página de destino
+        // );
       },
       child: Card(
         shape: RoundedRectangleBorder(
@@ -294,7 +310,8 @@ class ReceitaDoDiaCard extends StatelessWidget {
                   ),
                   child: Image.asset(
                     imageUrl,
-                    height: 200, // Ajuste o tamanho da imagem conforme necessário
+                    height:
+                        200, // Ajuste o tamanho da imagem conforme necessário
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
