@@ -13,6 +13,10 @@ class AuthService extends ChangeNotifier {
   User? usuario;
   bool isLoading = true;
   String? username;
+  int? pontos;
+  String? descricaoPerfil;
+  String? fotoPerfil;
+  List<DateTime>? checkInDates;
 
   AuthService() {
     _authCheck();
@@ -22,7 +26,7 @@ class AuthService extends ChangeNotifier {
     _auth.authStateChanges().listen((User? user) {
       usuario = (user == null) ? null : user;
       if (user != null) {
-        _loadUsername();
+        _loadUserData();
       }
       isLoading = false;
       notifyListeners();
@@ -32,43 +36,86 @@ class AuthService extends ChangeNotifier {
   _getUser() {
     usuario = _auth.currentUser;
     if (usuario != null) {
-      _loadUsername();
+      _loadUserData();
+    } else {
+      username = null;
+      pontos = null;
+      descricaoPerfil = null;
+      fotoPerfil = null;
+      checkInDates = null;
     }
     notifyListeners();
   }
-  Future<void> _loadUsername() async {
+
+  Future<void> _loadUserData() async {
     if (usuario != null) {
       try {
         DocumentSnapshot userDoc = await _firestore.collection('usuarios').doc(usuario!.uid).get();
         print("Documento do usuário: ${userDoc.data()}");
-        if (userDoc.exists && userDoc.data() != null) {
+        if (userDoc.exists) {
           username = userDoc['username'];
-          print("Nome de usuário carregado: $username");
+          pontos = userDoc['pontos'];
+          descricaoPerfil = userDoc['descricaoPerfil'];
+          fotoPerfil = userDoc['fotoPerfil'];
+          checkInDates = (userDoc['checkInDates'] as List<dynamic>?)
+              ?.map((timestamp) => (timestamp as Timestamp).toDate())
+              .toList();
+          print("Dados do usuário carregados: $username, $pontos, $descricaoPerfil, $fotoPerfil");
         } else {
           print("Documento do usuário não encontrado");
           username = null;
+          pontos = null;
+          descricaoPerfil = null;
+          fotoPerfil = null;
+          checkInDates = null;
         }
       } catch (e) {
-        print("Erro ao carregar nome de usuário: $e");
+        print("Erro ao carregar dados do usuário: $e");
         username = null;
+        pontos = null;
+        descricaoPerfil = null;
+        fotoPerfil = null;
       }
       isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> updateUsername(String uid, String newUsername) async {
-    try {
-      await _firestore.collection('usuarios').doc(uid).set({
-        'username': newUsername,
-      }, SetOptions(merge: true));
-      username = newUsername;
-      notifyListeners();
-    } catch (e) {
-      print("Erro ao atualizar nome de usuário: $e");
-    }
+  Future<void> updateUserData(String uid, {String? username, int? pontos, String? descricaoPerfil, String? fotoPerfil, List<DateTime>? checkInDates}) async {
+    Map<String, dynamic> data = {};
+    if (username != null) data['username'] = username;
+    if (pontos != null) data['pontos'] = pontos;
+    if (descricaoPerfil != null) data['descricaoPerfil'] = descricaoPerfil;
+    if (fotoPerfil != null) data['fotoPerfil'] = fotoPerfil;
+    if (checkInDates != null) data['checkInDates'] = checkInDates;
+
+    await _firestore.collection('usuarios').doc(uid).set(data, SetOptions(merge: true));
+    if (username != null) this.username = username;
+    if (pontos != null) this.pontos = pontos;
+    if (descricaoPerfil != null) this.descricaoPerfil = descricaoPerfil;
+    if (fotoPerfil != null) this.fotoPerfil = fotoPerfil;
+    if (checkInDates != null) this.checkInDates = checkInDates;
+    notifyListeners();
   }
 
+  Future<void> registrarCheckInDiario() async {
+    if (usuario != null) {
+      DateTime now = DateTime.now();
+      DateTime today = DateTime(now.year, now.month, now.day);
+
+      if (checkInDates == null) {
+        checkInDates = [];
+      }
+
+      bool alreadyCheckedInToday = checkInDates!.any((date) => date.isAtSameMomentAs(today));
+
+      if (!alreadyCheckedInToday) {
+        int newPontos = (pontos ?? 0) + 2; // Adiciona 2 pontos por check-in diário
+        checkInDates!.add(today);
+        await updateUserData(usuario!.uid, pontos: newPontos, checkInDates: checkInDates);
+      }
+    }
+  }
 
   registrar(String email, String senha) async {
     try {
@@ -97,9 +144,20 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
+Future<void> logout() async {
     await _auth.signOut();
     username = null;
+    pontos = null;
+    descricaoPerfil = null;
+    fotoPerfil = null;
+    checkInDates = null;
     _getUser();
+  }
+
+  Future<void> adicionarPontosPorReceita(int pontosRecebidos) async {
+    if (usuario != null) {
+      int novosPontos = (pontos ?? 0) + pontosRecebidos;
+      await updateUserData(usuario!.uid, pontos: novosPontos);
+    }
   }
 }

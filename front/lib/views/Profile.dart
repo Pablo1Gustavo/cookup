@@ -5,10 +5,12 @@ import 'package:country_flags/country_flags.dart';
 import 'package:front/components/LogoutButton.dart';
 import 'package:front/components/NomeUsuarioCard.dart';
 import 'package:front/components/Username.dart';
+import 'package:front/services/auth_service.dart';
 import 'package:front/utils/constants.dart';
 import 'package:front/views/HomePage.dart';
 import 'package:front/views/Mission_page.dart';
 import 'package:front/views/RecipeList.dart';
+import 'package:provider/provider.dart';
 import '../components/BottomNavigation.dart';
 
 class Profile extends StatefulWidget {
@@ -51,20 +53,23 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  void changeName() {
+  void changeUserProfile(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return NomeUsuarioCard(
-          onSubmit: (username) async {
-            // Salvar o nome de usuário no Firestore
+          onSubmit: (username, descricaoPerfil, fotoPerfil) async {
+            // Salvar os dados do usuário no Firestore
             User? user = FirebaseAuth.instance.currentUser;
             if (user != null) {
-              await FirebaseFirestore.instance
-                  .collection('usuarios')
-                  .doc(user.uid)
-                  .set({'username': username}, SetOptions(merge: true));
+              await context.read<AuthService>().updateUserData(
+                user.uid,
+                username: username,
+                descricaoPerfil: descricaoPerfil,
+                fotoPerfil: fotoPerfil,
+              );
+              Navigator.of(context).pop(); // Fechar o diálogo após salvar
             }
           },
         );
@@ -76,7 +81,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    
+    final authService = context.watch<AuthService>();
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -106,7 +111,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       height: screenHeight * 0.03,
                       child: ElevatedButton(
                         onPressed: () {
-                          changeName();
+                          changeUserProfile(context);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
@@ -118,12 +123,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.03),
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Column(
                           children: [
-                            Text('200',
+                            Text('${authService.pontos}',
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold)),
                             Text('Pontos'),
