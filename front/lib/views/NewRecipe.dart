@@ -1,9 +1,15 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:front/components/AddItemBottomSheet.dart';
-import 'package:front/components/ImagePickerComponent.dart';
-import 'package:front/utils/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:front/views/RecipeList.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:front/components/AddItemBottomSheet.dart';
+import 'package:front/components/AddStepBottomSheet.dart';
+import 'package:front/components/ImagePickerComponent.dart';
+import 'package:front/utils/constants.dart';
+import 'package:front/models/receita.dart';
 
 class NewRecipe extends StatefulWidget {
   const NewRecipe({super.key});
@@ -13,12 +19,14 @@ class NewRecipe extends StatefulWidget {
 }
 
 class _NewRecipeState extends State<NewRecipe> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _tituloController = TextEditingController();
+  final TextEditingController _pontuacaoController = TextEditingController();
+  final TextEditingController _tempoPreparoController = TextEditingController();
+
   XFile? selectedImage;
-  List<Step> steps = [
-    Step(title: 'Passo 1'),
-    Step(title: 'Passo 2'),
-    Step(title: 'Passo 3'),
-  ];
+
+  List<String> passos = [];
   List<String> ingredients = [];
 
   Future<void> _showAddItemBottomSheet() async {
@@ -38,48 +46,21 @@ class _NewRecipeState extends State<NewRecipe> {
     );
   }
 
-  Future<void> _showTimePicker() async {
-    TimeOfDay? pickedTime = await showTimePicker(
+  Future<void> _showAddStepBottomSheet() async {
+    await showModalBottomSheet(
       context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: primaryColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: primaryColor,
-              ),
-            ),
-          ),
-          child: child!,
+      isScrollControlled: true,
+      backgroundColor: white,
+      builder: (context) {
+        return AddStepBottomSheet(
+          onStepAdded: (newStep) {
+            setState(() {
+              passos.add(newStep);
+            });
+          },
         );
       },
     );
-
-    if (pickedTime != null) {
-      print('Timer: ${pickedTime.format(context)}');
-      // Adicione a lógica para usar o tempo selecionado
-    }
-  }
-
-  void _addStep() {
-    setState(() {
-      steps.add(Step(title: 'Passo ${steps.length + 1}'));
-    });
-  }
-
-  void _removeStep(int index) {
-    setState(() {
-      steps.removeAt(index);
-      for (int i = 0; i < steps.length; i++) {
-        steps[i].title = 'Passo ${i + 1}';
-      }
-    });
   }
 
   void _removeIngredient(int index) {
@@ -88,277 +69,192 @@ class _NewRecipeState extends State<NewRecipe> {
     });
   }
 
+  void _removePasso(int index) {
+    setState(() {
+      passos.removeAt(index);
+    });
+  }
+
+  void _onFinish() async {
+    if (_formKey.currentState!.validate()) {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null && selectedImage != null) {
+        String userId = user.uid;
+        Reference imagemStorageRef = FirebaseStorage.instance.ref().child('receitas/${_tituloController.text}');
+        UploadTask uploadTask = imagemStorageRef.putFile(File(selectedImage!.path));
+        TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+
+        String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+        Receita receita = Receita(
+          nome: _tituloController.text,
+          imagemUrl: imageUrl,
+          pontuacao: int.parse(_pontuacaoController.text),
+          tempoPreparo: int.parse(_tempoPreparoController.text),
+          listaIngredientes: ingredients,
+          ordemPreparo: passos,
+          usuarioRef: FirebaseFirestore.instance.doc('/usuarios/$userId'),
+        );
+
+        FirebaseFirestore firestore = FirebaseFirestore.instance;
+        await firestore.collection('receitas').add(receita.toMap()).then((docRef) {
+          print("Documento adicionado com ID: ${docRef.id}");
+          
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RecipeList()
+            ),
+          );
+        }).catchError((error) {
+          print("Erro ao adicionar documento: $error");
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize:
-            Size.fromHeight(screenHeight * 0.08), // altura da app bar
-        child: Padding(
-          padding: const EdgeInsets.only(top: 24.0), // padding superior
-          child: AppBar(
-            title: const Text(
-              'Nova Receita',
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            backgroundColor: backgroundColor,
-          ),
-        ),
+      appBar: AppBar(
+        title: Text('Nova Receita'),
+        backgroundColor: backgroundColor,
       ),
       backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            ImagePickerComponent(
-              onImagePicked: (image) {
-                setState(() {
-                  selectedImage = image;
-                });
-              },
-            ),
-            const SizedBox(height: 10.0),
-            TextField(
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50.0),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                ImagePickerComponent(
+                  onImagePicked: (image) {
+                    setState(() {
+                      selectedImage = image;
+                    });
+                  },
                 ),
-                hintText: 'Insira o título da receita',
-                hintStyle: const TextStyle(color: black200),
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            const Text(
-              'Ingredientes',
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: ingredients.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(ingredients[index]),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _removeIngredient(index),
-                  ),
-                );
-              },
-            ),
-            ElevatedButton(
-              onPressed: _showAddItemBottomSheet,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: white,
-                padding: const EdgeInsets.all(10.0),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add,
-                    size: 24,
-                    color: black400,
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Adicionar Ingrediente',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: black400,
+                const SizedBox(height: 24.0),
+                TextFormField(
+                  controller: _tituloController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(50.0),
                     ),
+                    hintText: 'Insira o título da receita',
+                    hintStyle: const TextStyle(color: black200),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            Divider(),
-            Expanded(
-              child: ListView(
-                children: <Widget>[
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: steps.length,
-                    itemBuilder: (context, index) {
-                      Step step = steps[index];
-                      return ExpansionTile(
-                        title: Text(
-                          step.title,
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w400,
-                              color: black400),
-                        ),
-                        initiallyExpanded: step.isExpanded,
-                        onExpansionChanged: (expanded) {
-                          setState(() {
-                            step.isExpanded = expanded;
-                          });
-                        },
-                        children: [
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: _showAddItemBottomSheet,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: white,
-                                          padding: const EdgeInsets.all(10.0),
-                                        ),
-                                        child: const Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.add,
-                                              size: 24,
-                                              color: black400,
-                                            ),
-                                            SizedBox(width: 8),
-                                            Text(
-                                              'Item',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: black400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 24),
-                              Expanded(
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: _showTimePicker,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: white,
-                                          padding: const EdgeInsets.all(10.0),
-                                        ),
-                                        child: const Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.timer,
-                                              size: 24,
-                                              color: black400,
-                                            ),
-                                            SizedBox(width: 8),
-                                            Text(
-                                              'Timer',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: black400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 24),
-                              IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => _removeStep(index),
-                              ),
-                            ],
-                          )
-                        ],
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _addStep,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: white,
-                      padding: const EdgeInsets.all(10.0),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, insira o título da receita';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24.0),
+                TextFormField(
+                  controller: _pontuacaoController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(50.0),
                     ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add,
-                          size: 24,
-                          color: black400,
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Adicionar Passo',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: black400,
-                          ),
-                        ),
-                      ],
-                    ),
+                    hintText: 'Insira a pontuação',
+                    hintStyle: const TextStyle(color: black200),
                   ),
-                ],
-              ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, insira a pontuação';
+                    }
+                    if (int.tryParse(value) == null) {
+                      return 'Por favor, insira um número válido';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24.0),
+                TextFormField(
+                  controller: _tempoPreparoController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(50.0),
+                    ),
+                    hintText: 'Insira o tempo de preparo (minutos)',
+                    hintStyle: const TextStyle(color: black200),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, insira o tempo de preparo';
+                    }
+                    if (int.tryParse(value) == null) {
+                      return 'Por favor, insira um número válido';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24.0),
+                BoxIngredients(
+                  ingredients: ingredients,
+                  onAdd: _showAddItemBottomSheet,
+                  onRemove: (index) => _removeIngredient(index),
+                ),
+                const SizedBox(height: 10.0),
+                Divider(),
+                BoxSteps(
+                  passos: passos,
+                  onAdd: _showAddStepBottomSheet,
+                  onRemove: (index) => _removePasso(index),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16.0),
-        color: backgroundColor,
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const RecipeList(),
-              ),
-            );
-          },
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.all(10.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0),
-            ),
-            backgroundColor: primaryColor,
+      bottomNavigationBar: CustomBottomNavigationBar(onFinish: _onFinish),
+    );
+  }
+}
+
+class CustomBottomNavigationBar extends StatelessWidget {
+  final VoidCallback onFinish;
+
+  const CustomBottomNavigationBar({
+    required this.onFinish,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      color: Colors.white,
+      child: ElevatedButton.icon(
+        onPressed: onFinish,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.all(10.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
           ),
-          child: const Text(
-            'Finalizar Criação',
-            style: TextStyle(
-              fontSize: 14.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+          backgroundColor: primaryColor,
+        ),
+        icon: Icon(Icons.check, color: Colors.white),
+        label: Text(
+          'Finalizar Criação',
+          style: TextStyle(
+            fontSize: 14.0,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
       ),
@@ -366,8 +262,88 @@ class _NewRecipeState extends State<NewRecipe> {
   }
 }
 
-class Step {
-  String title;
-  bool isExpanded;
-  Step({required this.title, this.isExpanded = false});
+class BoxIngredients extends StatelessWidget {
+  final List<String> ingredients;
+  final Function(int) onRemove;
+  final VoidCallback onAdd;
+
+  const BoxIngredients({
+    required this.ingredients,
+    required this.onRemove,
+    required this.onAdd,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('Ingredientes', style: TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8.0),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: ingredients.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(ingredients[index]),
+              trailing: IconButton(
+                icon: Icon(Icons.remove_circle),
+                onPressed: () => onRemove(index),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 8.0),
+        ElevatedButton(
+          onPressed: onAdd,
+          child: Text('Adicionar Ingrediente'),
+        ),
+      ],
+    );
+  }
+}
+
+class BoxSteps extends StatelessWidget {
+  final List<String> passos;
+  final Function(int) onRemove;
+  final VoidCallback onAdd;
+
+  const BoxSteps({
+    required this.passos,
+    required this.onRemove,
+    required this.onAdd,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('Passos', style: TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8.0),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: passos.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(passos[index]),
+              trailing: IconButton(
+                icon: Icon(Icons.remove_circle),
+                onPressed: () => onRemove(index),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 8.0),
+        ElevatedButton(
+          onPressed: onAdd,
+          child: Text('Adicionar Passo'),
+        ),
+      ],
+    );
+  }
 }
