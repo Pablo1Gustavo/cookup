@@ -33,7 +33,6 @@ class _CheckInDiarioCardState extends State<CheckInDiarioCard> {
   @override
   Widget build(BuildContext context) {
     final authService = context.watch<AuthService>();
-    final checkInDates = authService.checkInDates ?? [];
 
     return Card(
       color: Colors.orange[100],
@@ -63,13 +62,13 @@ class _CheckInDiarioCardState extends State<CheckInDiarioCard> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(7, (index) {
                 DateTime date = DateTime.now().subtract(Duration(days: index));
-                bool checkedIn = checkInDates.any((d) => d.year == date.year && d.month == date.month && d.day == date.day);
+                // bool checkedIn = checkInDates.any((d) => d.year == date.year && d.month == date.month && d.day == date.day);
 
                 return Column(
                   children: [
                     CircleAvatar(
                       radius: 16,
-                      backgroundColor: checkedIn ? Colors.green : Colors.grey,
+                      backgroundColor: Colors.grey,
                       child: Text(
                         '+${2 + index * 2}',
                         style: TextStyle(color: Colors.white, fontSize: 12),

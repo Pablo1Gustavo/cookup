@@ -161,8 +161,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       ],
                     ),
                     SizedBox(height: screenHeight * 0.03),
-                    const Text(
-                      'Fazedor de miojo por paixão e chef nos feriados.',
+                    Text(
+                      '${authService.descricaoPerfil}',
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
                     ),

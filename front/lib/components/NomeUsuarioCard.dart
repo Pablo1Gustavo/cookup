@@ -29,7 +29,7 @@ class _NomeUsuarioCardState extends State<NomeUsuarioCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Escolha um Nome de Usuário',
+                'Digite suas informações',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16),
@@ -87,26 +87,39 @@ class _NomeUsuarioCardState extends State<NomeUsuarioCard> {
                 },
               ),
               SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    widget.onSubmit(
-                      _usernameController.text.trim(),
-                      _descricaoController.text.trim(),
-                      _fotoController.text.trim(),
-                    );
-                    context.read<AuthService>().updateUserData(
-                      context.read<AuthService>().usuario!.uid,
-                      username: _usernameController.text.trim(),
-                      descricaoPerfil: _descricaoController.text.trim(),
-                      fotoPerfil: _fotoController.text.trim(),
-                      pontos: 0, // Valor padrão inicial para pontos
-                    ); // Atualiza os dados do usuário no AuthService
+              Row(
+                children: [
+                  ElevatedButton(onPressed:() {
                     Navigator.of(context).pop();
-                  }
-                },
-                child: Text('Confirmar'),
+                  }, 
+                  child: Text('Cancelar',
+                    style: TextStyle(
+                      color: Colors.red,)
+                  ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        widget.onSubmit(
+                          _usernameController.text.trim(),
+                          _descricaoController.text.trim(),
+                          _fotoController.text.trim(),
+                        );
+                        context.read<AuthService>().updateUserData(
+                          context.read<AuthService>().usuario!.uid,
+                          username: _usernameController.text.trim(),
+                          descricaoPerfil: _descricaoController.text.trim(),
+                          fotoPerfil: _fotoController.text.trim(),
+                          pontos: 0, // Valor padrão inicial para pontos
+                        ); // Atualiza os dados do usuário no AuthService
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Text('Confirmar'),
+                  ),
+                ],
               ),
+              
             ],
           ),
         ),
