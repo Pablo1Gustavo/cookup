@@ -6,7 +6,7 @@ import 'package:front/models/post.dart';
 import 'package:front/components/PostCard.dart';
 import 'package:front/views/Profile.dart';
 import 'package:front/views/RecipeList.dart';
-import 'package:front/views/Mission_page.dart';
+import 'package:front/views/MissionPage.dart';
 import 'package:front/utils/constants.dart';
 
 class HomePage extends StatefulWidget {

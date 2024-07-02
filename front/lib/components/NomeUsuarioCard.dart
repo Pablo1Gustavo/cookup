@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:front/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:front/services/auth_service.dart';
 
 class NomeUsuarioCard extends StatefulWidget {
-  final void Function(String) onSubmit;
+  final void Function(String, String, String) onSubmit;
 
   NomeUsuarioCard({required this.onSubmit});
 
@@ -13,6 +13,8 @@ class NomeUsuarioCard extends StatefulWidget {
 
 class _NomeUsuarioCardState extends State<NomeUsuarioCard> {
   final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _descricaoController = TextEditingController();
+  final TextEditingController _fotoController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -27,7 +29,7 @@ class _NomeUsuarioCardState extends State<NomeUsuarioCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Escolha um Nome de Usuário',
+                'Digite suas informações',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16),
@@ -49,20 +51,75 @@ class _NomeUsuarioCardState extends State<NomeUsuarioCard> {
                 },
               ),
               SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    widget.onSubmit(_usernameController.text.trim());
-                    context.read<AuthService>().updateUsername(
-                      context.read<AuthService>().usuario!.uid,
-                      _usernameController.text.trim(),
-                    ); // Atualiza o nome do usuário no AuthService
-                    Navigator.of(context).pop();
+              TextFormField(
+                controller: _descricaoController,
+                decoration: InputDecoration(
+                  hintText: 'Descrição do Perfil',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Por favor, insira uma descrição do perfil';
                   }
+                  return null;
                 },
-
-                child: Text('Confirmar'),
               ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _fotoController,
+                decoration: InputDecoration(
+                  hintText: 'URL da Foto do Perfil',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Por favor, insira a URL da foto do perfil';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  ElevatedButton(onPressed:() {
+                    Navigator.of(context).pop();
+                  }, 
+                  child: Text('Cancelar',
+                    style: TextStyle(
+                      color: Colors.red,)
+                  ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        widget.onSubmit(
+                          _usernameController.text.trim(),
+                          _descricaoController.text.trim(),
+                          _fotoController.text.trim(),
+                        );
+                        context.read<AuthService>().updateUserData(
+                          context.read<AuthService>().usuario!.uid,
+                          username: _usernameController.text.trim(),
+                          descricaoPerfil: _descricaoController.text.trim(),
+                          fotoPerfil: _fotoController.text.trim(),
+                          pontos: 0, // Valor padrão inicial para pontos
+                        ); // Atualiza os dados do usuário no AuthService
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Text('Confirmar'),
+                  ),
+                ],
+              ),
+              
             ],
           ),
         ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:front/components/CheckInDiarioCard.dart';
+import 'package:front/services/auth_service.dart';
 import 'package:front/views/HomePage.dart';
 import 'package:front/views/Profile.dart';
 import 'package:front/views/RecipeList.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../components/BottomNavigation.dart';
 import '../utils/constants.dart';
@@ -78,18 +80,22 @@ class _MissoesTabState extends State<MissoesTab> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        // Aqui você pode adicionar widgets para as missões
-        ExploreMissionsCard(imageUrl: 'assets/cow_cheff.png',),
+        ExploreMissionsCard(
+          imageUrl: 'assets/cow_cheff.png',
+        ),
         SizedBox(height: screenHeight * 0.02),
         CheckInDiarioCard(),
         SizedBox(height: screenHeight * 0.02),
-        ReceitaDoDiaCard(imageUrl: 'assets/alfajor.png',rating: 3,recipeName: 'ALFAJOR',xpPoints: 222, )
-        // Adicione mais cards conforme necessário
+        ReceitaDoDiaCard(
+          imageUrl: 'assets/alfajor.png',
+          rating: 3,
+          recipeName: 'ALFAJOR',
+          xpPoints: 222,
+        )
       ],
     );
   }
@@ -107,7 +113,7 @@ class ConquistasTab extends StatelessWidget {
           icon: Icons.star,
           title: 'Fez o primeiro sushi',
           subtitle: '20/04/2023 - +10XP',
-        ),        
+        ),
         Achievement(
           icon: Icons.star,
           title: 'Comida Brasileira Nível 1',
@@ -139,8 +145,12 @@ class Achievement extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: Icon(icon, color: Colors.yellowAccent,),
-        title: Text(title,
+        leading: Icon(
+          icon,
+          color: Colors.yellowAccent,
+        ),
+        title: Text(
+          title,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(subtitle),
@@ -149,100 +159,22 @@ class Achievement extends StatelessWidget {
   }
 }
 
-class CheckInDiarioCard extends StatefulWidget {
-  const CheckInDiarioCard({Key? key}) : super(key: key);
-
-  @override
-  _CheckInDiarioCardState createState() => _CheckInDiarioCardState();
-}
-
-class _CheckInDiarioCardState extends State<CheckInDiarioCard> {
-  List<String> _weekDays = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentWeek();
-  }
-
-  void _getCurrentWeek() {
-    DateTime now = DateTime.now();
-    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1)); // Start of the week (Monday)
-    _weekDays = List.generate(7, (index) {
-      DateTime day = startOfWeek.add(Duration(days: index));
-      return DateFormat('dd/MM').format(day);
-    });
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.orange[100], // Ajuste a cor conforme necessário
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Check-in Diário',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: primaryColor,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Acumule pontos diariamente e compre novas skins',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: primaryColor,
-              ),
-            ),
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(7, (index) {
-                return Column(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: index == 0 ? Colors.green : Colors.grey[300],
-                      child: Text(
-                        '+${(index + 1) * 2}',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      _weekDays.isNotEmpty ? _weekDays[index] : '',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                    ),
-                  ],
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ExploreMissionsCard extends StatelessWidget {
   final String imageUrl;
 
-  const ExploreMissionsCard({Key? key, required this.imageUrl}) : super(key: key);
+  const ExploreMissionsCard({Key? key, required this.imageUrl})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final authService = context.watch<AuthService>();
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Profile()), // Substitua NewPage pela sua página de destino
-        );
+        print(authService.username);
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => Profile()), // Substitua NewPage pela sua página de destino
+        // );
       },
       child: Card(
         shape: RoundedRectangleBorder(
@@ -378,7 +310,8 @@ class ReceitaDoDiaCard extends StatelessWidget {
                   ),
                   child: Image.asset(
                     imageUrl,
-                    height: 200, // Ajuste o tamanho da imagem conforme necessário
+                    height:
+                        200, // Ajuste o tamanho da imagem conforme necessário
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),

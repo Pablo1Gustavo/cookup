@@ -6,7 +6,7 @@ import 'package:front/components/RecipeListCard.dart';
 import 'package:front/models/receita.dart';
 import 'package:front/utils/constants.dart';
 import 'package:front/views/HomePage.dart';
-import 'package:front/views/Mission_page.dart';
+import 'package:front/views/MissionPage.dart';
 import 'package:front/views/NewRecipe.dart';
 import 'package:front/views/SearchRecipe.dart';
 import '../components/BottomNavigation.dart';

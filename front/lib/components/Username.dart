@@ -21,7 +21,7 @@ class _UserProfileState extends State<UserProfile> {
     }
 
     return Text(
-      authService.username ?? 'Nome de usuário não encontrado',
+      authService.username ?? 'Usuário não encontrado',
       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
     );
   }
