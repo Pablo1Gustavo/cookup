@@ -1,10 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:front/components/LogoutButton.dart';
 import 'package:front/components/NomeUsuarioCard.dart';
+import 'package:front/components/RecipeListCard.dart';
 import 'package:front/components/Username.dart';
+import 'package:front/models/post.dart';
+import 'package:front/models/receita.dart';
 import 'package:front/services/auth_service.dart';
 import 'package:front/utils/constants.dart';
 import 'package:front/views/HomePage.dart';
@@ -60,7 +64,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       builder: (context) {
         return NomeUsuarioCard(
           onSubmit: (username, descricaoPerfil, fotoPerfil) async {
-            // Salvar os dados do usuário no Firestore
             User? user = FirebaseAuth.instance.currentUser;
             if (user != null) {
               await context.read<AuthService>().updateUserData(
@@ -101,8 +104,17 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     SizedBox(height: screenHeight * 0.08),
                     CircleAvatar(
                       radius: screenHeight * 0.05,
-                      backgroundImage: const NetworkImage(
-                          'https://i.pinimg.com/564x/57/e4/60/57e4605cc710914108c49482bdda1366.jpg'),
+                      backgroundColor: Colors.grey[200],
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: authService.fotoPerfil ?? '',
+                          placeholder: (context, url) => CircularProgressIndicator(),
+                          errorWidget: (context, url, error) => Image.network('https://i.pinimg.com/564x/57/e4/60/57e4605cc710914108c49482bdda1366.jpg'),
+                          fit: BoxFit.cover,
+                          width: screenHeight * 0.1,
+                          height: screenHeight * 0.1,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     UserProfile(),
@@ -134,28 +146,22 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             Text('Pontos'),
                           ],
                         ),
+                        Container(
+                          height: 60.0,
+                          child: VerticalDivider(
+                            color: black200, 
+                            width: 1.0, 
+                            thickness: 2.0, 
+                            indent: 10.0, 
+                            endIndent: 10.0, 
+                          ),    
+                        ),                    
                         Column(
                           children: [
                             Text('400',
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold)),
                             Text('Receitas'),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Text('200',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
-                            Text('Seguidores'),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Text('200',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
-                            Text('Seguindo'),
                           ],
                         ),
                       ],
@@ -165,22 +171,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       '${authService.descricaoPerfil}',
                       style: TextStyle(fontSize: 16),
                       textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.location_pin, color: Colors.red),
-                        const Text('De Natal, Brasil',
-                            style: TextStyle(fontSize: 16)),
-                        const SizedBox(width: 5),
-                        CountryFlag.fromCountryCode(
-                          'BR',
-                          height: 24,
-                          width: 24,
-                          borderRadius: 8,
-                        ),
-                      ],
                     ),
                   ],
                 ),
@@ -192,16 +182,16 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 indicatorColor: primaryColor,
                 tabs: const [
                   Tab(icon: Icon(Icons.photo_library), text: "Feed"),
-                  Tab(icon: Icon(Icons.book), text: "Receitas Salvas"),
+                  Tab(icon: Icon(Icons.book), text: "Receitas Criadas"),
                   Tab(icon: Icon(Icons.star), text: "Conquistas"),
                 ],
               ),
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
-                  children: const [
-                    FeedTab(),
-                    SavedRecipesTab(),
+                  children: [
+                    FeedTab(userId: authService.usuario?.uid ?? ''),
+                    SavedRecipesTab(userId: authService.usuario?.uid ?? ''),
                     AchievementsTab(),
                   ],
                 ),
@@ -249,69 +239,101 @@ class AchievementsTab extends StatelessWidget {
 }
 
 class FeedTab extends StatelessWidget {
-  const FeedTab({super.key});
+  final String userId;
+
+  const FeedTab({Key? key, required this.userId}) : super(key: key);
+
+  Future<List<Post>> fetchPosts() async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('postagens')
+        .where('receita_ref', isNull: true)
+        .where('usuario_ref', isEqualTo: FirebaseFirestore.instance.doc('/usuarios/$userId'))
+        .get();
+
+
+    return querySnapshot.docs.map((doc) => Post.fromDocument(doc)).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 3,
-      children: List.generate(10, (index) {
-        return Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: Image.network(
-              'https://i.pinimg.com/564x/8d/71/c2/8d71c2cb56287e22643f20f53a2cac81.jpg',
-              fit: BoxFit.cover),
-        );
-      }),
+    return FutureBuilder<List<Post>>(
+      future: fetchPosts(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Erro ao carregar postagens'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('Nenhuma postagem encontrada'));
+        } else {
+          final posts = snapshot.data!;
+          return GridView.count(
+            crossAxisCount: 3,
+            children: List.generate(posts.length, (index) {
+              return Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: CachedNetworkImage(
+                  imageUrl: posts[index].imageUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color: black200,
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: white,
+                    child: Icon(Icons.error_outline_outlined, color: black200,),
+                  ),
+                ),
+              );
+            }),
+          );
+        }
+      },
     );
   }
 }
 
 class SavedRecipesTab extends StatelessWidget {
-  const SavedRecipesTab({super.key});
+  final String userId;
+
+  const SavedRecipesTab({Key? key, required this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        SavedRecipeCategory(
-          title: 'Japonesas',
-          recipes: List.generate(3, (index) {
-            return SavedRecipeItem(
-              title: 'Sushi',
-              imageUrl:
-                  'https://img.freepik.com/free-photo/maki-roll-with-cucumber-served-with-sauce-sesame-seeds_141793-790.jpg?t=st=1717690607~exp=1717694207~hmac=daa02204027a98f82a4f2156d615db3093825d5dce198adf2f461d3ce18d1fc6&w=740',
-              index: index,
-              totalItems: 3,
-            );
-          }),
-        ),
-        SavedRecipeCategory(
-          title: 'Italianas',
-          recipes: List.generate(3, (index) {
-            return SavedRecipeItem(
-              title: 'Pizza',
-              imageUrl:
-                  'https://img.freepik.com/free-photo/slice-crispy-pizza-with-meat-cheese_140725-6974.jpg?t=st=1717690586~exp=1717694186~hmac=7718023e64f9a62503a096c37a26115a68bf743c48ccd7ab37945142eda5ccc9&w=740',
-              index: index,
-              totalItems: 3,
-            );
-          }),
-        ),
-        SavedRecipeCategory(
-          title: 'Brasileiras',
-          recipes: List.generate(3, (index) {
-            return SavedRecipeItem(
-              title: 'Cuixcuix',
-              imageUrl:
-                  'https://img.freepik.com/premium-photo/cuscuz-with-cheese-typical-northeastern-food-white-plate-wooden-table_66339-373.jpg?w=996',
-              index: index,
-              totalItems: 3,
-            );
-          }),
-        ),
-      ],
+
+    return FutureBuilder<List<Receita>>(
+      future: fetchRecipes(userId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Erro ao carregar receitas'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('Nenhuma receita encontrada'));
+        } else {
+          final receitas = snapshot.data!;
+          return GridView.builder(
+            itemCount: receitas.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.8,
+            ),
+            itemBuilder: (context, index) {
+              final receita = receitas[index];
+              return RecipeListCard(receita: receita);
+            },
+          );
+        }
+      },
     );
+  }
+
+  Future<List<Receita>> fetchRecipes(String userId) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('receitas')
+        .where('usuario_ref', isEqualTo: FirebaseFirestore.instance.doc('/usuarios/$userId'))
+        .get();
+
+    return querySnapshot.docs.map((doc) => Receita.fromDocument(doc)).toList();
   }
 }
 
