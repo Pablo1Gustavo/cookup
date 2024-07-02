@@ -34,39 +34,56 @@ class _NomeUsuarioCardState extends State<NomeUsuarioCard> {
     }
   }
 
-  Future<void> _onFinish() async {
-    if (_formKey.currentState!.validate()) {
-      User? user = FirebaseAuth.instance.currentUser;
+Future<void> _onFinish() async {
+  if (_formKey.currentState!.validate()) {
+    User? user = FirebaseAuth.instance.currentUser;
 
-      if (user != null && _selectedImage != null) {
-        String userId = user.uid;
-        Reference imagemStorageRef = FirebaseStorage.instance
-            .ref()
-            .child('user_profiles/$userId');
-        UploadTask uploadTask = imagemStorageRef.putFile(_selectedImage!);
-        TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+    if (user != null && _selectedImage != null) {
+      String userId = user.uid;
+      Reference imagemStorageRef = FirebaseStorage.instance
+          .ref()
+          .child('user_profiles/$userId');
+      UploadTask uploadTask = imagemStorageRef.putFile(_selectedImage!);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
 
-        String imageUrl = await taskSnapshot.ref.getDownloadURL();
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
 
-        FirebaseFirestore firestore = FirebaseFirestore.instance;
-        await firestore.collection('usuarios').doc(userId).update({
-          'username': _usernameController.text.trim(),
-          'descricaoPerfil': _descricaoController.text.trim(),
-          'fotoPerfil': imageUrl,
-          'pontos': 0, // Valor padrão inicial para pontos
-        }).then((_) {
-          widget.onSubmit(
-            _usernameController.text.trim(),
-            _descricaoController.text.trim(),
-            imageUrl,
-          );
-          Navigator.of(context).pop();
-        }).catchError((error) {
-          print("Erro ao atualizar documento: $error");
-        });
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      DocumentReference userDocRef = firestore.collection('usuarios').doc(userId);
+
+      try {
+        DocumentSnapshot docSnapshot = await userDocRef.get();
+
+        if (docSnapshot.exists) {
+          // Update the document if it exists
+          await userDocRef.update({
+            'username': _usernameController.text.trim(),
+            'descricaoPerfil': _descricaoController.text.trim(),
+            'fotoPerfil': imageUrl,
+            'pontos': 0, // Valor padrão inicial para pontos
+          });
+        } else {
+          // Create the document if it doesn't exist
+          await userDocRef.set({
+            'username': _usernameController.text.trim(),
+            'descricaoPerfil': _descricaoController.text.trim(),
+            'fotoPerfil': imageUrl,
+            'pontos': 0, // Valor padrão inicial para pontos
+          });
+        }
+
+        widget.onSubmit(
+          _usernameController.text.trim(),
+          _descricaoController.text.trim(),
+          imageUrl,
+        );
+        Navigator.of(context).pop();
+      } catch (e) {
+        print("Erro ao criar ou atualizar documento: $e");
       }
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
