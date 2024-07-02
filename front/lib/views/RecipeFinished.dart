@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:front/components/AddPostBottom.dart';
 import 'package:front/models/receita.dart';
 import 'package:front/services/auth_service.dart';
 import 'package:front/utils/constants.dart';
@@ -42,10 +45,17 @@ class _RecipeFinishedState extends State<RecipeFinished> {
     context.read<AuthService>().adicionarPontosPorReceita(score);
   }
 
-
-
-  void _publishRecipe() {
-    // Implementar ação de publicar receita
+  Future<void> _publishRecipe() async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: white,
+      builder: (context) {
+        return AddPostBottom(
+          receitaUID: widget.receita.uid,
+        );
+      },
+    );
   }
 
   void _jumpPublish() {

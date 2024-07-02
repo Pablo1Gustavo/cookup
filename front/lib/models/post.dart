@@ -6,23 +6,25 @@ class Post {
   final String imageUrl;
   final DocumentReference<Map<String, dynamic>>? receitaRef;
   final DocumentReference<Map<String, dynamic>>? usuarioRef;
+  final Timestamp dataPostagem;
 
   Post({
     required this.curtidas,
     required this.descricao,
     this.imageUrl = "",
-    required this.receitaRef,
+    this.receitaRef,
     required this.usuarioRef,
-  }) : assert(receitaRef == null || imageUrl.isNotEmpty,
-              'Image URL is required when receitaRef is provided.');
+    required this.dataPostagem,
+  });
 
   Map<String, dynamic> toMap() {
     return {
       'curtidas': curtidas,
       'descricao': descricao,
       'image_url': imageUrl,
-      'receita_ref': receitaRef != null ? receitaRef! : null,
-      'usuario_ref': usuarioRef != null ? usuarioRef! : null,
+      'receita_ref': receitaRef,
+      'usuario_ref': usuarioRef,
+      'data_postagem': dataPostagem,
     };
   }
 
@@ -34,6 +36,7 @@ class Post {
       imageUrl: data['image_url'] ?? "",
       receitaRef: data['receita_ref'],
       usuarioRef: data['usuario_ref'],
+      dataPostagem: data['data_postagem'],
     );
   }
 }
