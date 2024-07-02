@@ -19,28 +19,30 @@ class _BottomNavigationState extends State<BottomNavigation> {
   
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      backgroundColor: white,
-      currentIndex: widget.currentIndex,
-      onTap: widget.onTap,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home, color: primaryColor),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person, color: primaryColor),
-          label: 'Perfil',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.book, color: primaryColor),
-          label: 'Receitas',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.assignment, color: primaryColor),
-          label: 'Missões',
-        ),
-      ],
+    return SingleChildScrollView(
+      child: BottomNavigationBar(
+        backgroundColor: white,
+        currentIndex: widget.currentIndex,
+        onTap: widget.onTap,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, color: primaryColor),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, color: primaryColor),
+            label: 'Perfil',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book, color: primaryColor),
+            label: 'Receitas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment, color: primaryColor),
+            label: 'Missões',
+          ),
+        ],
+      ),
     );
   }
 }
