@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:front/components/AddPostBottom.dart';
 import 'package:front/models/receita.dart';
 import 'package:front/utils/constants.dart';
 import 'package:front/views/RecipeList.dart';
@@ -37,11 +40,23 @@ class _RecipeFinishedState extends State<RecipeFinished> {
       message = "Você demorou um pouco mais!";
       score = (widget.receita.pontuacao * 0.9).round();
     }
+
+    _updateUserPoints(score);
   }
 
-  void _publishRecipe() {
-    // Implementar ação de publicar receita
+  Future<void> _publishRecipe() async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: white,
+      builder: (context) {
+        return AddPostBottom(
+          receitaUID: widget.receita.uid,
+        );
+      },
+    );
   }
+
 
   void _jumpPublish() {
     Navigator.push(
@@ -50,6 +65,33 @@ class _RecipeFinishedState extends State<RecipeFinished> {
         builder: (context) => RecipeList(),
       ),
     );
+  }
+
+  Future<void> _updateUserPoints(int newPoints) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final userDocRef = FirebaseFirestore.instance.collection('usuarios').doc(user.uid);
+        await FirebaseFirestore.instance.runTransaction((transaction) async {
+          DocumentSnapshot<Map<String, dynamic>> snapshot = await transaction.get(userDocRef);
+          if (snapshot.exists) {
+            int currentPoints = snapshot.data()?['pontos'] ?? 0;
+            int updatedPoints = currentPoints + newPoints;
+            transaction.update(userDocRef, {'pontos': updatedPoints});
+          }
+        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Pontos atualizados com sucesso!'),
+          duration: Duration(seconds: 2),
+        ));
+      }
+    } catch (e) {
+      print('Erro ao atualizar pontos: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Erro ao atualizar pontos. Tente novamente mais tarde.'),
+        duration: Duration(seconds: 2),
+      ));
+    }
   }
 
   @override

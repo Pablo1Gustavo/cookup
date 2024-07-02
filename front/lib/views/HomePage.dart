@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage>
             SizedBox(height: 16.0),
             Expanded(
               child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance.collection('postagens').snapshots(),
+                stream: FirebaseFirestore.instance.collection('postagens').orderBy('data_postagem', descending: true).snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(child: Text('Ocorreu um erro ao carregar as postagens.'));

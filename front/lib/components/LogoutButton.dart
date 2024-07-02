@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:front/services/auth_service.dart';
+import 'package:front/utils/constants.dart';
 import 'package:provider/provider.dart';
 
 class LogoutButton extends StatelessWidget {
@@ -10,9 +11,9 @@ class LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Align(
-        alignment: Alignment.topRight,
+        alignment: Alignment.centerRight,
         child: IconButton(
-          icon: Icon(Icons.logout, size: 40,),
+          icon: Icon(Icons.logout, size: 40, color: white,),
           onPressed: () {
             showDialog(
               context: context,

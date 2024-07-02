@@ -7,8 +7,8 @@ import 'package:front/utils/constants.dart';
 
 class SaveUnsaveRecipeButton extends StatefulWidget {
   final BorderRadius borderRadius;
-  final String receitaUID;  
-  final EdgeInsets padding; 
+  final String receitaUID;
+  final EdgeInsets padding;
 
   SaveUnsaveRecipeButton({
     required this.borderRadius,
@@ -22,7 +22,34 @@ class SaveUnsaveRecipeButton extends StatefulWidget {
 
 class _SaveUnsaveRecipeButtonState extends State<SaveUnsaveRecipeButton> {
   bool isSaved = false;
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfRecipeIsSaved();
+  }
+
+  Future<void> checkIfRecipeIsSaved() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      var snapshots = await FirebaseFirestore.instance
+          .collection('receitas_salvas')
+          .where('receita_ref',
+              isEqualTo:
+                  FirebaseFirestore.instance.doc('/receitas/${widget.receitaUID}'))
+          .where('usuario_ref',
+              isEqualTo:
+                  FirebaseFirestore.instance.doc('/usuarios/${user.uid}'))
+          .get();
+      if (mounted) {
+        setState(() {
+          isSaved = snapshots.docs.isNotEmpty;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +69,11 @@ class _SaveUnsaveRecipeButtonState extends State<SaveUnsaveRecipeButton> {
           ),
           color: Colors.white,
           onPressed: () async {
-            setState(() {
-              isSaved = !isSaved;
-            });
+            if (mounted) {
+              setState(() {
+                isSaved = !isSaved;
+              });
+            }
             if (isSaved) {
               await saveRecipe();
             } else {
@@ -71,16 +100,16 @@ class _SaveUnsaveRecipeButtonState extends State<SaveUnsaveRecipeButton> {
   }
 
   Future<void> unsaveRecipe() async {
-  User? user = _auth.currentUser;
-  if (user != null) {
-    var snapshots = await FirebaseFirestore.instance
-        .collection('receitas_salvas')
-        .where('receita_ref', isEqualTo: FirebaseFirestore.instance.doc('/receitas/${widget.receitaUID}'))
-        .where('usuario_ref', isEqualTo: FirebaseFirestore.instance.doc('/usuarios/${user.uid}'))
-        .get();
-    for (var doc in snapshots.docs) {
-      await doc.reference.delete();
+    User? user = _auth.currentUser;
+    if (user != null) {
+      var snapshots = await FirebaseFirestore.instance
+          .collection('receitas_salvas')
+          .where('receita_ref', isEqualTo: FirebaseFirestore.instance.doc('/receitas/${widget.receitaUID}'))
+          .where('usuario_ref', isEqualTo: FirebaseFirestore.instance.doc('/usuarios/${user.uid}'))
+          .get();
+      for (var doc in snapshots.docs) {
+        await doc.reference.delete();
+      }
     }
   }
-}
 }

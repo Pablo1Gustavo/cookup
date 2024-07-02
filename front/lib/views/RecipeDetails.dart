@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:front/components/CountDownCircle.dart';
@@ -50,18 +52,42 @@ class _RecipeDetailsState extends State<RecipeDetails> {
     });
   }
 
-  void _finishRecipe() {
+  void _finishRecipe() async {
     setState(() {
       _started = false;
       _timeSpentInSeconds = _totalTimeInMinutes * 60 - _secondsRemaining;
     });
+
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var snapshots = await FirebaseFirestore.instance
+          .collection('receitas_salvas')
+          .where('receita_ref', isEqualTo: FirebaseFirestore.instance.doc('/receitas/${widget.receita.uid}'))
+          .where('usuario_ref', isEqualTo: FirebaseFirestore.instance.doc('/usuarios/${user.uid}'))
+          .get();
+
+      if (snapshots.docs.isNotEmpty) {
+        var docId = snapshots.docs.first.id;
+        await FirebaseFirestore.instance.collection('receitas_salvas').doc(docId).update({
+          'tempo_preparo': _timeSpentInSeconds,
+          'data_realizacao': Timestamp.now(),
+        });
+      } else {
+        await FirebaseFirestore.instance.collection('receitas_salvas').add({
+          'receita_ref': FirebaseFirestore.instance.doc('/receitas/${widget.receita.uid}'),
+          'usuario_ref': FirebaseFirestore.instance.doc('/usuarios/${user.uid}'),
+          'tempo_preparo': _timeSpentInSeconds,
+          'data_realizacao': Timestamp.now(),
+        });
+      }
+    }
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => RecipeFinished(
           receita: widget.receita,
-          totalTimeInSeconds: _timeSpentInSeconds ,
+          totalTimeInSeconds: _timeSpentInSeconds,
         ),
       ),
     );
