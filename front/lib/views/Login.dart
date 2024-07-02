@@ -68,6 +68,7 @@ class _LoginState extends State<Login> {
       await context.read<AuthService>().registrar(_emailController.text, _senhaController.text);
 
       // Mostrar o card para o nome de usuário
+    if (mounted) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -84,12 +85,16 @@ class _LoginState extends State<Login> {
                   descricaoPerfil: descricaoPerfil,
                   fotoPerfil: fotoPerfil,
                 );
-                Navigator.of(context).pop(); // Fechar o diálogo após salvar
+                // Ensure the dialog is closed if it's still open
+                if (mounted) {
+                  Navigator.of(context).pop(); // Fechar o diálogo após salvar
+                }
               }
             },
           );
         },
       );
+    }
     } on AuthException catch (e) {
       setState(() => loading = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
